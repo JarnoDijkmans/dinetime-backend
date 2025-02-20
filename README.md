@@ -1,2 +1,2 @@
-# dine_time_backend
+# DineTime backend
 Backend for the DineTime application
