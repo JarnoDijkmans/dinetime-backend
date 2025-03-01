@@ -14,7 +14,6 @@ public class LeaderboardResponseModel {
 @Getter
 @AllArgsConstructor
 public static class RankingOutput {
-    private final long lobbyId;
     private final int mealId;
     private final double score;
 }

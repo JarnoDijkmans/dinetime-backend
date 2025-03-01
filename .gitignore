@@ -31,3 +31,6 @@ __pycache__/
 *.pyd
 venv/
 .env
+
+# Node.js dependencies
+node_modules/

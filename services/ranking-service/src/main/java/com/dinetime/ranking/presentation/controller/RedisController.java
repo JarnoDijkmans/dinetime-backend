@@ -26,6 +26,7 @@ public class RedisController {
         return (String) redisTemplate.opsForValue().get("myKey");
     }
 
+    @SuppressWarnings({ "deprecation", "null" })
     @DeleteMapping("/flush")
     public ResponseEntity<String> flushRedis() {
         redisTemplate.getConnectionFactory().getConnection().flushAll();

@@ -15,42 +15,43 @@ import com.dinetime.ranking.infrastructure.entity.RankingEntity;
 public class LeaderboardExpiredEventUseCase {
 
     private final StringRedisTemplate redisTemplate;
+//    private final IRankingRepository rankingRepository; // Add Repository for DB Save
 
     public LeaderboardExpiredEventUseCase(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
+//        this.rankingRepository = rankingRepository;
     }
 
     public void execute(LeaderboardExpiredEvent event) {
         long lobbyId = event.getLobbyId();
         Set<ZSetOperations.TypedTuple<String>> mealScores = event.getMealScores();
 
-        List<RankingEntity> rankings = new ArrayList<>();
-
+        List<Object> mealIds = new ArrayList<>();
         for (ZSetOperations.TypedTuple<String> mealScore : mealScores) {
-            String mealId = mealScore.getValue();
-            Double score = mealScore.getScore();
-
-            if (score != null) {
-                // Retrieve user ID associated with this meal ID
-                String userKey = "user:data:" + mealId;
-                String userId = (String) redisTemplate.opsForHash().get(userKey, "userId");
-
-                if (userId != null) {
-                    // Create a RankingEntity and add to the list
-                    RankingEntity ranking = new RankingEntity(
-                            lobbyId,
-                            Integer.parseInt(mealId),
-                            score,
-                            Long.parseLong(userId));
-                    rankings.add(ranking);
-                }
+            if (mealScore.getValue() != null) {
+                mealIds.add(mealScore.getValue());
             }
         }
 
-        // Create and save the LeaderboardEntity with the list of rankings
-        // if (!rankings.isEmpty()) {
-        //     LeaderboardEntity leaderboard = new LeaderboardEntity(lobbyId, rankings);
-        //     repository.saveLeaderboard(leaderboard);
-        // }
+        // Fetch all user IDs in one Redis call
+        List<Object> userIds = redisTemplate.opsForHash().multiGet("user:data", mealIds);
+
+        List<RankingEntity> rankings = new ArrayList<>();
+        int index = 0;
+        for (ZSetOperations.TypedTuple<String> mealScore : mealScores) {
+            String mealId = mealScore.getValue();
+            Double score = mealScore.getScore();
+            String userIdStr = userIds.get(index) != null ? userIds.get(index).toString() : null;
+            index++;
+
+            if (mealId != null && score != null && userIdStr != null) {
+                rankings.add(new RankingEntity(lobbyId, Integer.parseInt(mealId), score, Long.parseLong(userIdStr)));
+            }
+        }
+
+        // Batch save rankings
+        if (!rankings.isEmpty()) {
+//            rankingRepository.saveAll(rankings);
+        }
     }
 }

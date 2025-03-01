@@ -1,5 +1,5 @@
 package com.dinetime.ranking.application.port;
 
-public interface IEventPublisher {
-    void publish(Object event);
+public interface ISchedulerService {
+    void schedulePreSave(String leaderboardKey, int delayInSeconds);
 }

@@ -37,7 +37,6 @@ public class GetLeaderboardUseCase {
         // Step 3: Domain Model → Response Model
         List<RankingOutput> rankingEntries = leaderboard.getRankings().stream()
             .map(ranking -> new RankingOutput(
-                ranking.getLobbyId(),
                 ranking.getMealId(),
                 ranking.getScore()
             ))

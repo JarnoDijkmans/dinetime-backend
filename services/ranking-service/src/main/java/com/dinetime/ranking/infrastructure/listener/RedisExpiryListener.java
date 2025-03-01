@@ -1,8 +1,9 @@
 package com.dinetime.ranking.infrastructure.listener;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -10,33 +11,42 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import com.dinetime.ranking.application.event.LeaderboardExpiredEvent;
-import com.dinetime.ranking.application.port.IEventPublisher;
 
 @Component
 public class RedisExpiryListener implements MessageListener {
 
     private final StringRedisTemplate redisTemplate;
-    private final IEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Autowired
-    public RedisExpiryListener(StringRedisTemplate redisTemplate, IEventPublisher eventPublisher) {
+    private static final String LEADERBOARD_PREFIX = "leaderboard:";
+
+    public RedisExpiryListener(StringRedisTemplate redisTemplate, ApplicationEventPublisher eventPublisher) {
         this.redisTemplate = redisTemplate;
         this.eventPublisher = eventPublisher;
     }
 
     @Override
-    public void onMessage(@SuppressWarnings("null") Message message, @SuppressWarnings("null") byte[] pattern) {
-        String expiredKey = new String(message.getBody());
+    public void onMessage(Message message, byte[] pattern) {
+        String expiredKey = new String(message.getBody(), StandardCharsets.UTF_8);
 
-        if (expiredKey.startsWith("leaderboard:")) {
-            long lobbyId = Long.parseLong(expiredKey.replace("leaderboard:", ""));
+        if (expiredKey.startsWith("preexpiry:")) {
+            try {
+                // ✅ Extract the original leaderboard key
+                String leaderboardKey = expiredKey.replace("preexpiry:", "");
 
-            // Fetch all meal IDs and scores from Redis
-            Set<ZSetOperations.TypedTuple<String>> mealScores = redisTemplate.opsForZSet().rangeWithScores(expiredKey, 0, -1);
+                // ✅ Fetch the leaderboard data before expiration
+                Set<ZSetOperations.TypedTuple<String>> mealScores = redisTemplate.opsForZSet().rangeWithScores(leaderboardKey, 0, -1);
 
-            // Publish the event
-            LeaderboardExpiredEvent event = new LeaderboardExpiredEvent(lobbyId, mealScores);
-            eventPublisher.publish(event);
+                if (mealScores != null && !mealScores.isEmpty()) {
+                    // ✅ Extract lobbyId from the leaderboard key
+                    long lobbyId = Long.parseLong(leaderboardKey.replace(LEADERBOARD_PREFIX, ""));
+
+                    // ✅ Directly publish Spring Event (No Pub/Sub, No JSON parsing)
+                    eventPublisher.publishEvent(new LeaderboardExpiredEvent(lobbyId, mealScores));
+                }
+            } catch (Exception e) {
+                System.err.println("Error processing leaderboard expiration: " + e.getMessage());
+            }
         }
     }
 }
