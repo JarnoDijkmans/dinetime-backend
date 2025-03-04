@@ -1,7 +1,7 @@
-package com.dinetime.ranking.domain.repository;
+// package com.dinetime.ranking.domain.repository;
 
-import com.dinetime.ranking.infrastructure.entity.LeaderboardEntity;
+// import com.dinetime.ranking.infrastructure.entity.LeaderboardEntity;
 
-public interface ILeaderboardRedisRepository {
-    LeaderboardEntity getLeaderboard(long id);
-}
+// public interface ILeaderboardRedisRepository {
+//     LeaderboardEntity getLeaderboard(long id);
+// }
