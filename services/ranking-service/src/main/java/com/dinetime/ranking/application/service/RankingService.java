@@ -1,25 +1,20 @@
 package com.dinetime.ranking.application.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.dinetime.ranking.application.port.IRankingService;
-import com.dinetime.ranking.application.usecase.Ranking.StoreRankingUseCase;
-import com.dinetime.ranking.presentation.request.RankingRequestModel;
 
 @Service
-public class RankingService implements IRankingService {
+public class RankingService implements IRankingService{
+    // private final LeaderboardRepository repository;
 
-   private final StoreRankingUseCase storeRankingUseCase;
+    // public RankingService(LeaderboardRepository repository) {
+    //     this.repository = repository;
+    // }
 
-   @Autowired
-   public RankingService(StoreRankingUseCase storeRankingUseCase) {
-       this.storeRankingUseCase = storeRankingUseCase;
-   }
-
-    public void storeRankings(RankingRequestModel rankings) {
-        storeRankingUseCase.execute(rankings);
-       
-    }
-    
+    // @Override
+    // public void batchSaveVotes(List<VoteEvent> votes) {
+    //     repository.batchInsertVotes(votes);
+    // }
 }

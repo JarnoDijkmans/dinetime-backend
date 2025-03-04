@@ -1,30 +1,25 @@
 package com.dinetime.ranking.presentation.controller;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.dinetime.ranking.application.port.IRankingService;
-import com.dinetime.ranking.presentation.request.RankingRequestModel;
+import com.dinetime.ranking.presentation.request.VotesRequestModel;
 
 
 @RestController
-@RequestMapping("/ranking")
+@RequestMapping("/votes")
 public class RankingController {
-    private final IRankingService rankingService;
+    // private final IRankingService rankingService;
 
-    @Autowired
-    public RankingController(IRankingService rankingService) {
-        this.rankingService = rankingService;
-    }
+    // public RankingController(IRankingService rankingService) {
+    //     this.rankingService = rankingService;
+    // }
 
-    @PostMapping("store")
-    public ResponseEntity<Object> storeRanking(@RequestBody RankingRequestModel requestModel){
-        rankingService.storeRankings(requestModel);
-        //Receive a response
-        return ResponseEntity.ok("Ranking stored!");
+    @PostMapping("/batch")
+    public ResponseEntity<VotesRequestModel> batchSaveVotes(@RequestBody VotesRequestModel votes) {
+        return ResponseEntity.ok(votes);
+        // rankingService.batchSaveVotes(votes);
+        // return ResponseEntity.ok("✅ Votes stored successfully.");
     }
-    
 }

@@ -8,16 +8,16 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RankingRequestModel {
-    private List<RankingRequest> rankings;
+public class VotesRequestModel {
+    private List<VoteRequest> votes;
 
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor 
-    public static class RankingRequest {
-        private long lobbyId;
-        private int mealId;
-        private double score;
+    public static class VoteRequest {
         private long userId;
+        private int mealId;
+        private long lobbyId;
+        private int score;
     }
 }
