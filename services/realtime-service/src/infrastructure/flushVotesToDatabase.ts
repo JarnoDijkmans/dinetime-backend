@@ -1,8 +1,7 @@
 import axios from "axios";
 import { redisClient, connectRedis } from "./config/redisClient";
-import { Vote, VoteEvent } from "../shared/types";
 
-async function flushVotesToRankingService() {
+async function flushLeaderboardsToRankingService() {
     if (!redisClient.isOpen) {
         console.log("⏳ Waiting for Redis connection...");
         await connectRedis();  // ✅ Ensure Redis is connected before using it
@@ -16,38 +15,50 @@ async function flushVotesToRankingService() {
 
     await redisClient.set("processing_lock", "true", { EX: 300 });
 
-    // ✅ Fetch votes from Redis queue
-    const votes = await redisClient.lRange("pending_votes_db", 0, -1);
-    const parsedVotes: Vote[] = votes.map((vote) => {
+    // ✅ Get all pending leaderboards from Redis
+    const keys = await redisClient.keys("pending_votes:*");
+    if (keys.length === 0) {
+        console.log("⚠️ No leaderboards to flush.");
+        await redisClient.del("processing_lock");
+        return;
+    }
+
+    const leaderboards: Record<string, { mealId: number; totalScore: number }[]> = {};
+
+
+    // ✅ Fetch data from each pending leaderboard
+    for (const key of keys) {
+        const lobbyId = key.split(":")[1]; // Extract the lobbyId
+        const meals = await redisClient.hGetAll(key);
+
+        // Convert meal scores to a proper format
+        leaderboards[lobbyId] = Object.entries(meals).map(([mealId, totalScore]) => ({
+            mealId: parseInt(mealId),
+            totalScore: parseFloat(totalScore)
+        }));
+    }
+
+    if (Object.keys(leaderboards).length > 0) {
         try {
-            return JSON.parse(vote) as Vote;
+            // ✅ Send leaderboards in batch
+            await axios.post("http://localhost:8080/leaderboards/batch", { leaderboards });
+
+            // ✅ Clear processed leaderboards
+            for (const key of keys) {
+                await redisClient.del(key);
+            }
+
+            console.log(`💾 Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
         } catch (error) {
-            console.error("❌ Error parsing vote from Redis:", error);
-            return null;
-        }
-    }).filter((vote): vote is Vote => vote !== null); // ✅ Filters out invalid votes
-
-    if (parsedVotes.length > 0) {
-        try {
-            const voteEvent: VoteEvent = { votes: parsedVotes };
-
-            // ✅ Send votes in a batch to `ranking-service`
-            await axios.post("http://localhost:8080/votes/batch", voteEvent);
-
-            // ✅ Clear Redis queue after successful processing
-            await redisClient.del("pending_votes_db");
-
-            console.log(`💾 Sent ${parsedVotes.length} votes to ranking-service.`);
-        } catch (error) {
-            console.error("❌ Error sending votes to ranking-service:", error);
+            console.error("❌ Error sending leaderboards to ranking-service:", error);
         }
     } else {
-        console.log("⚠️ No votes to flush.");
+        console.log("⚠️ No leaderboards found.");
     }
 
     await redisClient.del("processing_lock");
 }
 
 // ✅ Run every 6 hours
-setInterval(flushVotesToRankingService, 30000);
-flushVotesToRankingService();
+// setInterval(flushLeaderboardsToRankingService, 21600000); // 6 hours
+flushLeaderboardsToRankingService();
