@@ -18,6 +18,6 @@ public class LeaderboardsRequestModel {
     @NoArgsConstructor
     public static class LeaderboardEntry {
         private int mealId;
-        private double totalScore;
+        private int totalScore;
     }
 }

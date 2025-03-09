@@ -61,4 +61,5 @@ async function flushLeaderboardsToRankingService() {
 
 // ✅ Run every 6 hours
 // setInterval(flushLeaderboardsToRankingService, 21600000); // 6 hours
+setInterval(flushLeaderboardsToRankingService, 30000)
 flushLeaderboardsToRankingService();
