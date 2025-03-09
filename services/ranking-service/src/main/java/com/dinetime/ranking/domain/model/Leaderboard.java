@@ -9,5 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Leaderboard {
     private final long lobbyId;
-    private final List<Ranking> rankings;
+    private final List<LeaderboardItem> items;
 }

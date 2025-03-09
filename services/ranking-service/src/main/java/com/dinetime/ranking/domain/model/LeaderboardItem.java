@@ -5,12 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 @AllArgsConstructor
-public class Ranking {
-    private final long lobbyId;
+public class LeaderboardItem {
     private final int mealId;
-    private final double score;
-    private long userId;
-
+    private final int totalScore;
 }
