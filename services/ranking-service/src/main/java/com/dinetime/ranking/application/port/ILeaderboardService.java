@@ -1,5 +1,8 @@
 package com.dinetime.ranking.application.port;
 
-public interface IRankingService {
-    
+import com.dinetime.ranking.presentation.request.LeaderboardsRequestModel;
+import com.dinetime.ranking.presentation.response.LeaderboardResponseModel;
+
+public interface ILeaderboardService {
+    LeaderboardResponseModel batchSaveLeaderboard (LeaderboardsRequestModel requestModel);
 }

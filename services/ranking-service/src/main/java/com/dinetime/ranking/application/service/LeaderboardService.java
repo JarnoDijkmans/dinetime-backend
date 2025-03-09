@@ -1,20 +1,24 @@
 package com.dinetime.ranking.application.service;
 
 
+import com.dinetime.ranking.application.usecase.Leaderboard.StoreLeaderboardUseCase;
+import com.dinetime.ranking.domain.model.Leaderboard;
+import com.dinetime.ranking.presentation.request.LeaderboardsRequestModel;
+import com.dinetime.ranking.presentation.response.LeaderboardResponseModel;
 import org.springframework.stereotype.Service;
 
-import com.dinetime.ranking.application.port.IRankingService;
+import com.dinetime.ranking.application.port.ILeaderboardService;
 
 @Service
-public class RankingService implements IRankingService{
-    // private final LeaderboardRepository repository;
+public class LeaderboardService implements ILeaderboardService {
+    private final StoreLeaderboardUseCase storeLeaderboardUseCase;
 
-    // public RankingService(LeaderboardRepository repository) {
-    //     this.repository = repository;
-    // }
+     public LeaderboardService(StoreLeaderboardUseCase storeLeaderboardUseCase) {
+         this.storeLeaderboardUseCase = storeLeaderboardUseCase;
+     }
 
-    // @Override
-    // public void batchSaveVotes(List<VoteEvent> votes) {
-    //     repository.batchInsertVotes(votes);
-    // }
+     @Override
+     public LeaderboardResponseModel batchSaveLeaderboard(LeaderboardsRequestModel requestModel) {
+         return storeLeaderboardUseCase.execute(requestModel);
+     }
 }

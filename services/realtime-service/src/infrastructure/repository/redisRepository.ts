@@ -41,13 +41,12 @@ export class RedisRepository implements LeaderboardPort {
     async voteMeal(userId: number, mealId: number, lobbyId: number, newScore: number) {
         const leaderboardKey = `leaderboard:${lobbyId}`;
         const pendingVotesKey = `pending_votes:${lobbyId}`;
-        const userVoteKey = `vote:${userId}:${mealId}:${lobbyId}`; // ✅ Store user vote here
+        const userVoteKey = `vote:${userId}:${mealId}:${lobbyId}`;
     
         // ✅ Ensure leaderboard exists before voting
         const exists = await this.redisClient.exists(leaderboardKey);
         if (!exists) {
             console.log(`⚠️ Leaderboard ${leaderboardKey} does not exist. Creating it now...`);
-            await this.redisClient.zAdd(leaderboardKey, [{ score: 0, value: "placeholder" }]);
             await this.redisClient.expire(leaderboardKey, 50400); // 14-hour expiry
         }
     
@@ -65,31 +64,18 @@ export class RedisRepository implements LeaderboardPort {
         // ✅ Step 2: Store the user's vote in Redis (so `getUserVote()` works)
         await this.redisClient.set(userVoteKey, newScore);
     
-        // ✅ Step 3: Fetch updated total score from leaderboard
-        const realTimeTotalScore = await this.redisClient.zScore(leaderboardKey, mealId.toString());
+        // ✅ Step 3: Fetch updated full leaderboard
+        const leaderboardEntries = await this.redisClient.zRangeWithScores(leaderboardKey, 0, -1);
     
-        console.log("realTimeTotalScore:", realTimeTotalScore);
+        // ✅ Step 4: Update pending_votes_db to match leaderboard
+        await this.redisClient.del(pendingVotesKey); // Clear old values to prevent duplicates
     
-        if (realTimeTotalScore !== null) {
-            // Get current total from pending_votes_db
-            const existingPendingTotal = await this.redisClient.hGet(pendingVotesKey, mealId.toString());
-    
-            // Adjust the pending total by removing old vote and adding new one
-            const updatedPendingTotal = existingPendingTotal
-                ? parseFloat(existingPendingTotal) - (existingVote || 0) + newScore
-                : realTimeTotalScore;
-    
-            await this.redisClient.hSet(pendingVotesKey, mealId.toString(), updatedPendingTotal.toString());
-    
-            console.log(`📢 Updated pending_votes_db: Meal ${mealId} in lobby ${lobbyId} now has ${updatedPendingTotal}`);
+        for (const entry of leaderboardEntries) {
+            await this.redisClient.hSet(pendingVotesKey, entry.value, entry.score.toString());
         }
+    
+        const pendingVotes = await this.redisClient.hGetAll(pendingVotesKey);
+        console.log(`📢 Updated pending_votes_db for lobby ${lobbyId}:`, { ...pendingVotes });
+
     }
-    
-    
-    
-    
-    
-    
-    
-    
 }
