@@ -41,11 +41,9 @@ export class LeaderboardWebSocketController {
             if (data.type === "join_lobby") {
                 ws.lobbyId = data.lobbyId;
                 console.log(`✅ User joined lobby ${ws.lobbyId}`);
-    
             }
     
             if (data.type === "vote_meal") {
-                // ✅ Check if the user is in a lobby before allowing voting
                 if (!ws.lobbyId) {
                     ws.send(JSON.stringify({ type: "error", message: "You must join a lobby before voting!" }));
                     return;
@@ -53,6 +51,13 @@ export class LeaderboardWebSocketController {
     
                 console.log(`📝 Storing vote: User ${data.userId} voted ${data.score} for meal ${data.mealId} in lobby ${ws.lobbyId}`);
                 await this.leaderboardService.voteMeal(data.userId, data.mealId, ws.lobbyId, data.score);
+    
+                // ✅ Broadcast updated leaderboard ONLY to users in the same lobby
+                const updatedLeaderboard = await this.leaderboardService.getLeaderboard(ws.lobbyId, 10);
+                this.broadcastToLobby(ws.lobbyId, {
+                    type: "update_leaderboard",
+                    leaderboard: updatedLeaderboard,
+                });
             }
         } catch (error) {
             console.error("❌ Error processing WebSocket message:", error);
@@ -60,14 +65,14 @@ export class LeaderboardWebSocketController {
         }
     }
     
+    
 
-    // ✅ Broadcast leaderboard updates only to users in the correct lobby
-    private broadcastLeaderboardUpdate(leaderboard: any, lobbyId: number) {
-        this.wss.clients.forEach((client) => {
-            const typedClient = client as WebSocketWithLobby;
-            if (typedClient.readyState === BaseWebSocket.OPEN && typedClient.lobbyId === lobbyId) {
-                typedClient.send(JSON.stringify({ type: "leaderboard_update", data: leaderboard }));
+    private broadcastToLobby(lobbyId: number, message: any) {
+        this.wss.clients.forEach((client: WebSocketWithLobby) => {
+            if (client.readyState === WebSocket.OPEN && client.lobbyId === lobbyId) {
+                client.send(JSON.stringify(message));
             }
         });
     }
+    
 }
