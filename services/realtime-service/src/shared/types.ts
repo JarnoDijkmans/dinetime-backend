@@ -1,6 +1,6 @@
 export type WebSocketMessage =
     | { type: "join_lobby"; lobbyId: number }
-    | { type: "get_leaderboard" }
+    | { type: "FETCH_LEADERBOARD"; lobbyId: number }
     | { type: "vote_meal"; userId: number; mealId: number; score: number };
 
 

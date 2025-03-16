@@ -1,7 +1,7 @@
 import "dotenv/config";
 import http from "http";
 import express from "express";
-import { redisClient, connectRedis } from "./infrastructure/config/redisClient";
+import { connectRedis } from "./infrastructure/config/redisClient";
 import "./infrastructure/flushVotesToDatabase";
 import { LeaderboardWebSocketController } from "./presentation/controllers/leaderboardWebSocketController";
 import { LeaderboardService } from "./application/leaderboardService";
@@ -16,7 +16,7 @@ const server = http.createServer(app);
 // ✅ Connect to Redis
 connectRedis();
 
-const leaderboardRepository = new RedisRepository(redisClient);
+const leaderboardRepository = new RedisRepository();
 const leaderboardService = new LeaderboardService(leaderboardRepository);
 
 // ✅ Initialize WebSocket Server

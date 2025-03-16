@@ -41,23 +41,35 @@ export class LeaderboardWebSocketController {
             if (data.type === "join_lobby") {
                 ws.lobbyId = data.lobbyId;
                 console.log(`✅ User joined lobby ${ws.lobbyId}`);
+                
+                ws.send(JSON.stringify({ type: "join_lobby", lobbyId: ws.lobbyId }));
+            }
+
+            if (data.type === "FETCH_LEADERBOARD") {
+                console.log(`🔍 Fetching leaderboard request received for lobby ${data.lobbyId}`);
+                if (!data.lobbyId) {
+                    ws.send(JSON.stringify({ type: "error", message: "You must join a lobby before voting!" }));
+                    return;
+                }
+                try {
+                    const leaderboard = await this.leaderboardService.getLeaderboard(data.lobbyId, 10);
+                    console.log("✅ Sending leaderboard:", leaderboard);
+                    this.broadcastToLobby(data.lobbyId, { type: "update_leaderboard", leaderboard });
+                } catch (error) {
+                    console.error("❌ Error fetching leaderboard:", error);
+                    ws.send(JSON.stringify({ type: "error", message: "Failed to retrieve leaderboard" }));
+                }
             }
     
             if (data.type === "vote_meal") {
                 if (!ws.lobbyId) {
+                    console.log(`🛠️ Debug: ws.lobbyId =`, ws.lobbyId);
                     ws.send(JSON.stringify({ type: "error", message: "You must join a lobby before voting!" }));
                     return;
                 }
     
                 console.log(`📝 Storing vote: User ${data.userId} voted ${data.score} for meal ${data.mealId} in lobby ${ws.lobbyId}`);
                 await this.leaderboardService.voteMeal(data.userId, data.mealId, ws.lobbyId, data.score);
-    
-                // ✅ Broadcast updated leaderboard ONLY to users in the same lobby
-                const updatedLeaderboard = await this.leaderboardService.getLeaderboard(ws.lobbyId, 10);
-                this.broadcastToLobby(ws.lobbyId, {
-                    type: "update_leaderboard",
-                    leaderboard: updatedLeaderboard,
-                });
             }
         } catch (error) {
             console.error("❌ Error processing WebSocket message:", error);
