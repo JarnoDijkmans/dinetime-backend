@@ -1,12 +1,45 @@
-import { createClient, RedisClientType } from "redis";
+import Redis from "ioredis";
 
-export const redisClient: RedisClientType = createClient();
+let redisClientInstance: Redis | null = null;
+let redisSubscriberInstance: Redis | null = null;
 
-export async function connectRedis() {
-    if (!redisClient.isOpen) { 
-        await redisClient.connect();
-        console.log("✅ Redis Connected");
-    } else {
-        console.log("⚠️ Redis already connected, skipping reconnection.");
+// ✅ Function to get Redis client (lazy-loads the instance)
+export function getRedisClient(): Redis {
+    if (!redisClientInstance) {
+        redisClientInstance = new Redis({
+            host: process.env.REDIS_HOST || "localhost",
+            port: Number(process.env.REDIS_PORT) || 6379,
+            retryStrategy: (times) => Math.min(times * 50, 2000),
+        });
+
+        redisClientInstance.on("connect", () => console.log("🚀 Redis Connected"));
+        redisClientInstance.on("error", (err) => console.error("❌ Redis Error:", err));
+    }
+    return redisClientInstance;
+}
+
+// ✅ Function to get Redis Subscriber (lazy-loads the instance)
+export function getRedisSubscriber(): Redis {
+    if (!redisSubscriberInstance) {
+        redisSubscriberInstance = new Redis({
+            host: process.env.REDIS_HOST || "localhost",
+            port: Number(process.env.REDIS_PORT) || 6379,
+            retryStrategy: (times) => Math.min(times * 50, 2000),
+        });
+
+        redisSubscriberInstance.on("error", (err) => console.error("❌ Redis Subscriber Error:", err));
+    }
+    return redisSubscriberInstance;
+}
+
+// ✅ Function to properly close all Redis connections
+export async function closeRedisConnections() {
+    if (redisClientInstance) {
+        await redisClientInstance.quit();
+        redisClientInstance = null;
+    }
+    if (redisSubscriberInstance) {
+        await redisSubscriberInstance.quit();
+        redisSubscriberInstance = null;
     }
 }

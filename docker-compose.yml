@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+
+  ranking-service:
+    build:
+      context: ./services/ranking-service
+      args:
+        - JAR_FILE=build/libs/ranking-service-0.0.1-SNAPSHOT.jar
+    container_name: ranking-service
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+
+  realtime-service:
+    build:
+      context: ./services/realtime-service
+      target: prod              
+    container_name: realtime-service
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  redis-test:
+    image: redis:latest
+    container_name: redis-test
+    ports:
+      - "6380:6379"  # ✅ Test Redis on port 6380
+    command: ["redis-server", "--appendonly", "yes"]
+
+volumes:
+  redis-data:
