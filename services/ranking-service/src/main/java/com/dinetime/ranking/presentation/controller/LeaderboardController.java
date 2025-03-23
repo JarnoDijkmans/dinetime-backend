@@ -1,4 +1,6 @@
 package com.dinetime.ranking.presentation.controller;
+import com.dinetime.ranking.application.port.ILeaderboardService;
+import com.dinetime.ranking.presentation.response.LeaderboardResponseModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,18 +10,17 @@ import com.dinetime.ranking.presentation.request.LeaderboardsRequestModel;
 
 
 @RestController
-@RequestMapping("/votes")
+@RequestMapping("/leaderboards")
 public class LeaderboardController {
-    // private final IRankingService rankingService;
+     private final ILeaderboardService leaderboardService;
 
-    // public RankingController(IRankingService rankingService) {
-    //     this.rankingService = rankingService;
-    // }
+     public LeaderboardController(ILeaderboardService leaderboardService) {
+         this.leaderboardService = leaderboardService;
+     }
 
     @PostMapping("/batch")
-    public ResponseEntity<LeaderboardsRequestModel> batchSaveVotes(@RequestBody LeaderboardsRequestModel leaderboards) {
-        return ResponseEntity.ok(leaderboards);
-        // rankingService.batchSaveVotes(votes);
-        // return ResponseEntity.ok("✅ Votes stored successfully.");
+    public ResponseEntity<String> batchSaveVotes(@RequestBody LeaderboardsRequestModel leaderboards) {
+        LeaderboardResponseModel response = leaderboardService.batchSaveLeaderboard(leaderboards);
+         return ResponseEntity.ok(response.getMessage());
     }
 }

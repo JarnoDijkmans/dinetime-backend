@@ -1,7 +1,7 @@
-// package com.dinetime.ranking.domain.repository;
+ package com.dinetime.ranking.domain.repository;
 
-// import com.dinetime.ranking.infrastructure.entity.LeaderboardEntity;
+ import com.dinetime.ranking.domain.model.Leaderboard;
 
-// public interface ILeaderboardRepository {
-//     void save(LeaderboardEntity leaderboardEntity);
-// }
+ public interface ILeaderboardRepository {
+     void save(Leaderboard leaderboard);
+ }

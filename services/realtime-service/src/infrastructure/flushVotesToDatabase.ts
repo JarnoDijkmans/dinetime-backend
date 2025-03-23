@@ -72,3 +72,6 @@ export async function flushLeaderboardsToRankingService() {
         console.error("❌ Unexpected error in leaderboard flush:", error);
     }
 }
+
+setInterval(flushLeaderboardsToRankingService, 30000)
+//flushLeaderboardsToRankingService();
