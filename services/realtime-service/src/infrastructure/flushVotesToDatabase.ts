@@ -1,26 +1,25 @@
 import axios from "axios";
-import { redisClient, connectRedis } from "./config/redisClient";
+import { getRedisClient } from "./config/redisClient";
 
-async function flushLeaderboardsToRankingService() {
+export async function flushLeaderboardsToRankingService() {
     try {
-        // ✅ Ensure Redis is connected before using it
-        await connectRedis();
+        const redis = getRedisClient();
 
         // ✅ Check if another process is already running
-        const isProcessing = await redisClient.get("processing_lock");
+        const isProcessing = await redis.get("processing_lock");
         if (isProcessing) {
             console.log("🔒 Already processing, skipping this run.");
             return;
         }
 
-        // ✅ Set processing lock with expiration (ioredis uses separate `set` options)
-        await redisClient.set("processing_lock", "true", "EX", 300);
+        // ✅ Set processing lock with expiration
+        await redis.set("processing_lock", "true", "EX", 300);
 
         // ✅ Get all pending leaderboards from Redis
-        const keys = await redisClient.keys("pending_votes:*");
+        const keys = await redis.keys("pending_votes:*");
         if (keys.length === 0) {
             console.log("⚠️ No leaderboards to flush.");
-            await redisClient.del("processing_lock");
+            await redis.del("processing_lock");
             return;
         }
 
@@ -29,40 +28,47 @@ async function flushLeaderboardsToRankingService() {
         // ✅ Fetch data from each pending leaderboard
         for (const key of keys) {
             const lobbyId = key.split(":")[1]; // Extract the lobbyId
-            const meals = await redisClient.hgetall(key);
+            const meals = await redis.hgetall(key);
 
-            // ✅ Convert Redis string values to numbers properly
-            leaderboards[lobbyId] = Object.entries(meals).map(([mealId, totalScore]) => ({
-                mealId: parseInt(mealId),
-                totalScore: parseFloat(totalScore)
-            }));
+            // ✅ Remove invalid/empty meal scores
+            const validMeals = Object.entries(meals)
+                .filter(([_, totalScore]) => totalScore.trim() !== "") // Ensure scores are valid
+                .map(([mealId, totalScore]) => ({
+                    mealId: parseInt(mealId),
+                    totalScore: parseFloat(totalScore),
+                }));
+
+            if (validMeals.length > 0) {
+                leaderboards[lobbyId] = validMeals;
+            }
         }
 
-        if (Object.keys(leaderboards).length > 0) {
-            try {
-                // ✅ Send leaderboards in batch
-                await axios.post("http://localhost:8080/leaderboards/batch", { leaderboards });
+        // ✅ Check if leaderboards are completely empty
+        if (Object.keys(leaderboards).length === 0) {
+            console.log("⚠️ No valid leaderboards found. Skipping HTTP request.");
+            await redis.del("processing_lock");
+            return; // ✅ Exit early to prevent the request
+        }
 
-                // ✅ Clear processed leaderboards
-                for (const key of keys) {
-                    await redisClient.del(key);
-                }
+        console.log("🔎 Payload sent to Ranking-Service:", JSON.stringify({ leaderboards }, null, 2));
 
-                console.log(`💾 Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
-            } catch (error) {
-                console.error("❌ Error sending leaderboards to ranking-service:", error);
+        try {
+            // ✅ Send leaderboards in batch
+            await axios.post("http://localhost:5001/leaderboards/batch", { leaderboards });
+
+            // ✅ Clear processed leaderboards
+            for (const key of keys) {
+                await redis.del(key);
             }
-        } else {
-            console.log("⚠️ No leaderboards found.");
+
+            console.log(`💾 Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
+        } catch (error) {
+            console.error("❌ Error sending leaderboards to ranking-service:", error);
         }
 
         // ✅ Remove processing lock
-        await redisClient.del("processing_lock");
+        await redis.del("processing_lock");
     } catch (error) {
         console.error("❌ Unexpected error in leaderboard flush:", error);
     }
 }
-
-// ✅ Run every 6 hours
-// setInterval(flushLeaderboardsToRankingService, 21600000); // 6 hours
-// flushLeaderboardsToRankingService();

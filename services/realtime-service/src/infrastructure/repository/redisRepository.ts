@@ -1,12 +1,8 @@
 import { LeaderboardPort } from "../../ports/repo/leaderboardPort";
-import Redis from 'ioredis';
+import { getRedisClient  } from "../config/redisClient"; 
 
 export class RedisRepository implements LeaderboardPort {
-    private redis: Redis;
-
-    constructor() {
-        this.redis = new Redis(); // ✅ Correctly initializing Redis instance
-    }
+    private redis = getRedisClient(); 
 
     async getLeaderboard(lobbyId: number, limit: number): Promise<{ mealId: number; score: number }[]> {
         const leaderboardKey = `leaderboard:${lobbyId}`;
@@ -16,7 +12,6 @@ export class RedisRepository implements LeaderboardPort {
             leaderboardKey, "+inf", "-inf", "WITHSCORES", "LIMIT", 0, limit
         );
     
-        console.log('test');
         const formattedData = [];
         for (let i = 0; i < rawData.length; i += 2) {
             formattedData.push({
@@ -25,7 +20,6 @@ export class RedisRepository implements LeaderboardPort {
             });
         }
 
-        console.log("✅ Leaderboard Data:", formattedData);
         return formattedData;
     }
 
@@ -39,9 +33,9 @@ export class RedisRepository implements LeaderboardPort {
         const timeRemaining = await this.redis.ttl(`leaderboard:${lobbyId}`);
     
         if (timeRemaining === -2) {
-            return false; // Leaderboard does not exist
+            return false; 
         } else if (timeRemaining <= 7200) {
-            return false; // Less than 2 hours (12-hour mark reached)
+            return false; 
         }
         return true;
     }
@@ -51,17 +45,15 @@ export class RedisRepository implements LeaderboardPort {
         const pendingVotesKey = `pending_votes:${lobbyId}`;
         const userVoteKey = `vote:${userId}:${mealId}:${lobbyId}`;
 
-        // ✅ Ensure leaderboard exists before voting
         const exists = await this.redis.exists(leaderboardKey);
         if (!exists) {
             console.log(`⚠️ Leaderboard ${leaderboardKey} does not exist. Creating it now...`);
             
-            // ✅ Correct `zadd` usage in ioredis
+
             await this.redis.zadd(leaderboardKey, 0, '0');
-            await this.redis.expire(leaderboardKey, 50400); // 14-hour expiry
+            await this.redis.expire(leaderboardKey, 50400); 
         }
 
-        // ✅ Step 1: Get existing user vote
         const existingVote = await this.getUserVote(userId, mealId, lobbyId);
 
         if (existingVote !== null) {
@@ -72,19 +64,15 @@ export class RedisRepository implements LeaderboardPort {
             await this.redis.zincrby(leaderboardKey, newScore, mealId.toString());
         }
 
-        // ✅ Step 2: Store the user's vote in Redis (so `getUserVote()` works)
         await this.redis.set(userVoteKey, newScore.toString());
 
-        // ✅ Step 3: Fetch updated total score from leaderboard
         const realTimeTotalScore = await this.redis.zscore(leaderboardKey, mealId.toString());
 
         console.log("realTimeTotalScore:", realTimeTotalScore);
 
         if (realTimeTotalScore !== null) {
-            // Get current total from pending_votes_db
             const existingPendingTotal = await this.redis.hget(pendingVotesKey, mealId.toString());
 
-            // Adjust the pending total by removing old vote and adding new one
             const updatedPendingTotal = existingPendingTotal
                 ? parseFloat(existingPendingTotal) - (existingVote || 0) + newScore
                 : realTimeTotalScore;

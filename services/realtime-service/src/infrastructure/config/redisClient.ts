@@ -1,29 +1,45 @@
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
-// ✅ Main Redis client (for general operations)
-export const redisClient = new Redis({
-    host: 'localhost',
-    port: 6379,
-    retryStrategy: (times) => Math.min(times * 50, 2000) // Auto-reconnect strategy
-});
+let redisClientInstance: Redis | null = null;
+let redisSubscriberInstance: Redis | null = null;
 
-// ✅ Separate Redis client for Pub/Sub (to avoid conflicts)
-export const redisSubscriber = new Redis({
-    host: 'localhost',
-    port: 6379,
-    retryStrategy: (times) => Math.min(times * 50, 2000)
-});
+// ✅ Function to get Redis client (lazy-loads the instance)
+export function getRedisClient(): Redis {
+    if (!redisClientInstance) {
+        redisClientInstance = new Redis({
+            host: process.env.REDIS_HOST || "localhost",
+            port: Number(process.env.REDIS_PORT) || 6379,
+            retryStrategy: (times) => Math.min(times * 50, 2000),
+        });
 
-// ✅ Function to check Redis connection
-export async function connectRedis() {
-    try {
-        await redisClient.ping();
-        console.log("✅ Redis Connected");
+        redisClientInstance.on("connect", () => console.log("🚀 Redis Connected"));
+        redisClientInstance.on("error", (err) => console.error("❌ Redis Error:", err));
+    }
+    return redisClientInstance;
+}
 
-        redisClient.on('error', (err) => console.error("❌ Redis Error:", err));
-        redisSubscriber.on('error', (err) => console.error("❌ Redis Subscriber Error:", err));
+// ✅ Function to get Redis Subscriber (lazy-loads the instance)
+export function getRedisSubscriber(): Redis {
+    if (!redisSubscriberInstance) {
+        redisSubscriberInstance = new Redis({
+            host: process.env.REDIS_HOST || "localhost",
+            port: Number(process.env.REDIS_PORT) || 6379,
+            retryStrategy: (times) => Math.min(times * 50, 2000),
+        });
 
-    } catch (error) {
-        console.error("❌ Redis Connection Failed:", error);
+        redisSubscriberInstance.on("error", (err) => console.error("❌ Redis Subscriber Error:", err));
+    }
+    return redisSubscriberInstance;
+}
+
+// ✅ Function to properly close all Redis connections
+export async function closeRedisConnections() {
+    if (redisClientInstance) {
+        await redisClientInstance.quit();
+        redisClientInstance = null;
+    }
+    if (redisSubscriberInstance) {
+        await redisSubscriberInstance.quit();
+        redisSubscriberInstance = null;
     }
 }

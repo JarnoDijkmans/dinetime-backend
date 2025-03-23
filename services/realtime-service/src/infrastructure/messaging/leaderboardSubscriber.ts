@@ -1,7 +1,9 @@
 import { WebSocketServer } from "ws";
-import { redisSubscriber } from "../config/redisClient"; 
+import { getRedisSubscriber } from "../config/redisClient"; 
 
 export async function createLeaderboardSubscriber(wss: WebSocketServer) {
+    const redisSubscriber = getRedisSubscriber(); 
+
     redisSubscriber.subscribe("leaderboardUpdate", (err, count) => {
         if (err) {
             console.error("❌ Redis Subscription Error:", err);
