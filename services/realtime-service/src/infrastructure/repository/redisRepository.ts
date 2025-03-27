@@ -1,4 +1,4 @@
-import { LeaderboardPort } from "../../ports/repo/leaderboardPort";
+import { LeaderboardPort } from "../../application/ports/leaderboardPort";
 import { getRedisClient  } from "../config/redisClient"; 
 
 export class RedisRepository implements LeaderboardPort {

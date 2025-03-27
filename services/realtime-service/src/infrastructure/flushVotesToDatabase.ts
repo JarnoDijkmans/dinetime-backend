@@ -73,5 +73,5 @@ export async function flushLeaderboardsToRankingService() {
     }
 }
 
-setInterval(flushLeaderboardsToRankingService, 30000)
+// setInterval(flushLeaderboardsToRankingService, 30000)
 //flushLeaderboardsToRankingService();
