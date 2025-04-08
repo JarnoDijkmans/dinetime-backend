@@ -1,5 +1,5 @@
 import { RedisRepository } from "../../src/infrastructure/repository/redisRepository";
-import { getRedisClient, closeRedisConnections } from "../../src/infrastructure/config/redisClient";
+import { getRedisClient, closeRedisConnections } from "../../src/infrastructure/config/RedisClient";
 
 describe("RedisRepository AOF Tests (Mocked Redis)", () => {
     let redisRepo: RedisRepository;
@@ -7,14 +7,14 @@ describe("RedisRepository AOF Tests (Mocked Redis)", () => {
     const { execSync } = require("child_process");
 
     beforeAll(async () => {
-        redis = getRedisClient(); // ✅ Use the mock Redis client
+        redis = getRedisClient(); 
         redisRepo = new RedisRepository();
         (redisRepo as any).redis = redis;
     });
 
     afterAll(async () => {
         await redis.flushdb();
-        await closeRedisConnections(); // ✅ Ensure Redis is properly closed
+        await closeRedisConnections(); 
         jest.clearAllTimers();
     });
 

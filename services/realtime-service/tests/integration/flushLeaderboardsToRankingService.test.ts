@@ -2,30 +2,29 @@ import nock from "nock";
 import Redis from "ioredis-mock";
 
 
-// ✅ Create mock Redis instance once
+
 const mockRedis = new (require("ioredis-mock"))();
 
-// ✅ Mock Redis before importing the function
 jest.mock("../../src/infrastructure/config/redisClient", () => ({
-    getRedisClient: jest.fn(() => mockRedis), // ✅ Ensure `getRedisClient()` returns `mockRedis`
-    closeRedisConnections: jest.fn(() => Promise.resolve()) // ✅ Mock cleanup function
+    getRedisClient: jest.fn(() => mockRedis),
+    closeRedisConnections: jest.fn(() => Promise.resolve()) 
 }));
 
 import { flushLeaderboardsToRankingService } from "../../src/infrastructure/flushVotesToDatabase";
-import { getRedisClient, closeRedisConnections } from "../../src/infrastructure/config/redisClient";
+import { getRedisClient, closeRedisConnections } from "../../src/infrastructure/config/RedisClient";
 
 
 describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", () => {
     let redis: any; 
 
     beforeEach(async () => {
-        redis = getRedisClient(); // ✅ Calls the mocked function, which returns `mockRedis`
-        await redis.flushdb(); // ✅ Clears the mock database before each test
+        redis = getRedisClient(); 
+        await redis.flushdb(); 
         nock.cleanAll();
     });
 
     afterAll(async () => {
-        await closeRedisConnections(); // ✅ Properly close mocked Redis
+        await closeRedisConnections(); 
         nock.cleanAll();
         jest.clearAllTimers();
     });
@@ -72,7 +71,7 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
 
         await flushLeaderboardsToRankingService();
 
-        expect(scope.isDone()).toBe(false); // 🚀 No HTTP call should be made
+        expect(scope.isDone()).toBe(false); 
     });
 
     test("✅ Should skip processing when locked", async () => {
@@ -84,10 +83,10 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
 
         await flushLeaderboardsToRankingService();
 
-        expect(scope.isDone()).toBe(false); // 🚀 No HTTP call should be made
+        expect(scope.isDone()).toBe(false); 
 
         const lockExists = await redis.get("processing_lock");
-        expect(lockExists).toBe("true"); // 🚀 Lock should remain
+        expect(lockExists).toBe("true"); 
     });
 
     test("✅ Should not delete Redis data if ranking service fails", async () => {
@@ -99,10 +98,10 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
 
         await flushLeaderboardsToRankingService();
 
-        expect(scope.isDone()).toBe(true); // 🚀 HTTP call should have been made
+        expect(scope.isDone()).toBe(true); 
 
         const keysAfter = await redis.keys("pending_votes:*");
-        expect(keysAfter).toContain("pending_votes:300"); // 🚀 Data should NOT be deleted
+        expect(keysAfter).toContain("pending_votes:300"); 
     });
 
     test("✅ Should handle an empty payload properly", async () => {

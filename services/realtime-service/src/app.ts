@@ -1,37 +1,28 @@
 import "dotenv/config";
 import http from "http";
 import express from "express";
-import { getRedisClient } from "./infrastructure/config/redisClient"; // ✅ Use getRedisClient()
 import "./infrastructure/flushVotesToDatabase";
-import { LeaderboardWebSocketController } from "./presentation/controllers/leaderboardWebSocketController";
-import { LeaderboardService } from "./application/leaderboardService";
+import { WebSocketGateway } from "./presentation/websocket/WebSocketGateway";
+import { LeaderboardService } from "./application/services/LeaderboardService";
 import { RedisRepository } from "./infrastructure/repository/redisRepository";
+import { LobbyManager } from "./application/websocket/LobbyManager";
+import { WebsocketMessageHandler } from "./application/websocket/WebsocketMessageHandler";
 import { WebSocketServer } from "ws";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 const server = http.createServer(app);
-
-// ✅ Ensure Redis is ready before starting the app
-const redis = getRedisClient();
-redis.ping()
-    .then(() => console.log("🚀 Redis is ready!"))
-    .catch((err) => console.error("❌ Redis connection failed:", err));
+const wss = new WebSocketServer({ server, path: "/leaderboard-events" });
 
 const leaderboardRepository = new RedisRepository();
 const leaderboardService = new LeaderboardService(leaderboardRepository);
+const lobbyManager = new LobbyManager();
+const messageHandler = new WebsocketMessageHandler(leaderboardService, wss, lobbyManager);
 
-// ✅ Initialize WebSocket Server
-const websocketServer = new WebSocketServer({ server, path: "/leaderboard-events" });
-new LeaderboardWebSocketController(websocketServer, leaderboardService);
 
-// ✅ Express Route for Debugging (Optional)
-app.get("/", (req, res) => {
-    res.send("WebSocket Leaderboard Server is Running!");
-});
+new WebSocketGateway(wss, messageHandler);
 
-// ✅ Start the WebSocket & HTTP Server
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ WebSocket Leaderboard Server Running on port ${PORT}`);
 });
