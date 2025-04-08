@@ -1,4 +1,4 @@
-import { Connection } from "../application/ports/Connection";
+import { Connection } from "../ports/out/connection";
 import WebSocket from "ws";
 
 export class LobbyConnection implements Connection {

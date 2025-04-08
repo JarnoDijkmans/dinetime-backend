@@ -1,5 +1,5 @@
 import { WebSocketMessage } from "../../shared/types";
-import { Connection } from "../ports/Connection";
+import { Connection } from "../out/connection";
 
 export interface WebSocketMessageHandlerPort {
     handleJoinLobby(conn: Connection) : void;
