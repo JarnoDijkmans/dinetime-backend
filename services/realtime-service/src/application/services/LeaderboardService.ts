@@ -1,5 +1,5 @@
-import { LeaderboardServicePort } from "../ports/leaderboardServicePort";
-import { LeaderboardPort } from "../ports/leaderboardPort";
+import { LeaderboardServicePort } from "../ports/LeaderboardServicePort";
+import { LeaderboardPort } from "../ports/LeaderboardPort";
 
 export class LeaderboardService implements LeaderboardServicePort {
     private leaderboardRepository: LeaderboardPort;

@@ -1,4 +1,4 @@
-import { LeaderboardPort } from "../../application/ports/leaderboardPort";
+import { LeaderboardPort } from "../../application/ports/LeaderboardPort";
 import { getRedisClient  } from "../config/redisClient"; 
 
 export class RedisRepository implements LeaderboardPort {
@@ -7,7 +7,6 @@ export class RedisRepository implements LeaderboardPort {
     async getLeaderboard(lobbyId: number, limit: number): Promise<{ mealId: number; score: number }[]> {
         const leaderboardKey = `leaderboard:${lobbyId}`;
     
-        // ✅ Fetch top scores in descending order
         const rawData = await this.redis.zrevrangebyscore(
             leaderboardKey, "+inf", "-inf", "WITHSCORES", "LIMIT", 0, limit
         );

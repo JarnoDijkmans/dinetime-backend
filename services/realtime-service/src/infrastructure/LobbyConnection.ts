@@ -21,9 +21,6 @@ export class LobbyConnection implements Connection {
     }
   
     set lobbyId(id: number) {
-      if (this._lobbyId !== null) {
-        throw new Error("lobbyId has already been set.");
-      }
       this._lobbyId = id;
     }
   }
