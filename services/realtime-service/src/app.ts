@@ -2,11 +2,11 @@ import "dotenv/config";
 import http from "http";
 import express from "express";
 import "./infrastructure/flushVotesToDatabase";
-import { WebSocketGateway } from "./presentation/websocket/WebSocketGateway";
-import { LeaderboardService } from "./application/services/LeaderboardService";
+import { WebSocketGateway } from "./presentation/websocket/webSocketGateway";
+import { LeaderboardService } from "./application/services/leaderboardService";
 import { RedisRepository } from "./infrastructure/repository/redisRepository";
-import { LobbyManager } from "./application/websocket/LobbyManager";
-import { WebsocketMessageHandler } from "./application/websocket/WebsocketMessageHandler";
+import { LobbyManager } from "./application/websocket/lobbyManager";
+import { WebsocketMessageHandler } from "./application/websocket/websocketMessageHandler";
 import { WebSocketServer } from "ws";
 
 const app = express();

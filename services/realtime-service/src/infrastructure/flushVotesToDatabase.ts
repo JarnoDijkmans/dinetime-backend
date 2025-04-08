@@ -7,7 +7,7 @@ export async function flushLeaderboardsToRankingService() {
 
         const isProcessing = await redis.get("processing_lock");
         if (isProcessing) {
-            console.log("🔒 Already processing, skipping this run.");
+            console.log("Already processing, skipping this run.");
             return;
         }
 
@@ -50,9 +50,9 @@ export async function flushLeaderboardsToRankingService() {
                 await redis.del(key);
             }
 
-            console.log(`💾 Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
+            console.log(`Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
         } catch (error) {
-            console.error("❌ Error sending leaderboards to ranking-service:", error);
+            console.error("Error sending leaderboards to ranking-service:", error);
         }
 
         await redis.del("processing_lock");

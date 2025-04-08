@@ -1,10 +1,10 @@
 
 import { WebSocketServer } from "ws";
-import { LeaderboardServicePort } from "../ports/leaderboardServicePort";
-import { LobbyManager } from "./LobbyManager";
+import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
+import { LobbyManager } from "./lobbyManager";
 import { WebSocketMessage } from "../../shared/types";
-import { Connection } from "../ports/Connection";
-import { WebSocketMessageHandlerPort } from "../ports/WebSocketMessageHandlerPort";
+import { Connection } from "../../ports/out/connection";
+import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
 
 export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
     private leaderboardService: LeaderboardServicePort;

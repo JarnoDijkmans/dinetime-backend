@@ -1,8 +1,8 @@
 import { WebSocketServer } from "ws";
 import { WebSocketMessage } from "../../shared/types";
-import { WebSocketMessageHandlerPort } from "../../application/ports/WebSocketMessageHandlerPort";
-import { Connection } from "../../application/ports/Connection";
-import { LobbyConnection } from "../../infrastructure/LobbyConnection";
+import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
+import { Connection } from "../../ports/out/connection";
+import { LobbyConnection } from "../../infrastructure/lobbyConnection";
 
 export class WebSocketGateway {
     private wss: WebSocketServer;
