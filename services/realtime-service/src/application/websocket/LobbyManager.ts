@@ -1,4 +1,4 @@
-import { LobbyConnection } from "../../infrastructure/LobbyConnection";
+import { LobbyConnection } from "../../infrastructure/lobbyConnection";
 
 export class LobbyManager{
     private lobbies: Map<number, Set<LobbyConnection>> = new Map();
