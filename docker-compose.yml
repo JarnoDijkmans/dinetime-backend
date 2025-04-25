@@ -12,6 +12,20 @@ services:
       - "5001:5001"
     environment:
       - NODE_ENV=production
+    depends_on:
+      ranking-mysql:
+        condition: service_started
+
+  ranking-mysql:
+    image: mysql:8.0
+    container_name: ranking-service-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=!Gaptunklas7
+      - MYSQL_DATABASE=dinetime_ranking_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ranking-mysql-data:/var/lib/mysql
 
   realtime-service:
     build:
@@ -27,8 +41,27 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - redis
-    networks:
-      - dinetime-network
+  
+  matchmaker-service:
+    build:
+      context: ./services/matchmaker-service
+      args:
+        - JAR_FILE=build/libs/matchmaker-0.0.1-SNAPSHOT.jar
+    container_name: matchmaker-service
+    ports:
+      - "8080:8080" 
+
+  matchmaker-mysql:
+    image: mysql:8.0
+    container_name: matchmaker-service-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=!Gaptunklas7
+      - MYSQL_DATABASE=dinetime_matchmaker_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - matchmaker-mysql-data:/var/lib/mysql
+
 
   redis:
     image: redis:latest
@@ -50,7 +83,6 @@ services:
 
 volumes:
   redis-data:
+  ranking-mysql-data:
+  matchmaker-mysql-data:  
 
-networks:
-  dinetime-network:
-    external: true

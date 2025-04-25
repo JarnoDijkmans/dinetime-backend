@@ -41,3 +41,14 @@ node_modules/
 *.js.map
 dist/
 build/
+
+
+# Ignore DS_Store files
+.DS_Store
+
+# Gradle
+.gradle/
+build/
+*.lock
+*.bin
+*.properties
