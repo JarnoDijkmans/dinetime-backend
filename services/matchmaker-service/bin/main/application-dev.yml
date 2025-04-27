@@ -3,3 +3,5 @@ spring:
     url: jdbc:mysql://localhost:3307/dinetime_matchmaker_db
     username: root
     password: "!Gaptunklas7"
+
+# ./gradlew bootRun --args='--spring.profiles.active=dev'

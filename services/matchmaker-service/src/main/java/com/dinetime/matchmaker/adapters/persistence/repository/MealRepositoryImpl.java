@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,8 +30,10 @@ public class MealRepositoryImpl implements MealRepository {
     }
 
     @Override
-    public List<String> searchMeals(List<String> cuisine, List<String> requiredIngredients, List<String> excludedIngredients, int limit) {
-        List<String> safeCuisine = Optional.ofNullable(cuisine).orElse(Collections.emptyList());
+    public List<String> searchMeals(List<String> cuisines, List<String> requiredIngredients, List<String> excludedIngredients, int limit) {
+        System.err.println(cuisines);
+
+        List<String> safeCuisine = Optional.ofNullable(cuisines).orElse(Collections.emptyList());
         List<String> safeRequired = Optional.ofNullable(requiredIngredients).orElse(Collections.emptyList());
         List<String> safeExcluded = Optional.ofNullable(excludedIngredients).orElse(Collections.emptyList());
 
@@ -56,19 +59,40 @@ public class MealRepositoryImpl implements MealRepository {
 
     private int scoreMeal(Meal meal, List<String> cuisine, List<String> requiredIngredients) {
         int score = 0;
+    
         for (String cui : cuisine) {
-            if (meal.getCuisine().toLowerCase().contains(cui.toLowerCase())) {
-                score++;
-            }
-        }
-        for (String req : requiredIngredients) {
-            for (String ing : meal.getIngredients()) {
-                if (ing.toLowerCase().contains(req.toLowerCase())) {
+            List<String> mealCuisines = Optional.ofNullable(meal.getCuisines())
+                    .orElse(Collections.emptyList());
+        
+            for (String mealCui : mealCuisines) {
+                if (mealCui.toLowerCase().contains(cui.toLowerCase())) {
                     score++;
                     break;
                 }
             }
         }
+        
+        
+        
+        
+    
+        for (String req : requiredIngredients) {
+            boolean found = meal.getIngredients().stream()
+                .anyMatch(ing -> ing.toLowerCase().contains(req.toLowerCase()));
+    
+            if (found) {
+                score++;
+            }
+        }
+    
         return score;
+    }
+
+    @Override
+    public Meal getMealById(String mealId) {
+        return meals.stream()
+            .filter(meal -> meal.getId().equals(mealId))
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException("Meal not found with id: " + mealId));
     }
 }

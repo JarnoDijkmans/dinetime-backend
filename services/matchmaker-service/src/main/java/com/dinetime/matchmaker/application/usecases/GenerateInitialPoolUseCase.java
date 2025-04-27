@@ -35,5 +35,4 @@ public class GenerateInitialPoolUseCase {
         } while (matchRepository.exists(code));
         return code;
     }
-    
 }
