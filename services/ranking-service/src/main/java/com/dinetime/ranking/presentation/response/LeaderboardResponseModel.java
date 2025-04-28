@@ -1,6 +1,5 @@
 package com.dinetime.ranking.presentation.response;
 
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

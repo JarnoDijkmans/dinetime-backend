@@ -2,7 +2,6 @@ package com.dinetime.ranking.application.service;
 
 
 import com.dinetime.ranking.application.usecase.Leaderboard.StoreLeaderboardUseCase;
-import com.dinetime.ranking.domain.model.Leaderboard;
 import com.dinetime.ranking.presentation.request.LeaderboardsRequestModel;
 import com.dinetime.ranking.presentation.response.LeaderboardResponseModel;
 import org.springframework.stereotype.Service;
