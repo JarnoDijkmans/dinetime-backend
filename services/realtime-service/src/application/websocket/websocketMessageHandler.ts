@@ -1,7 +1,7 @@
 
 import { WebSocketServer } from "ws";
 import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
-import { LobbyManager } from "./lobbyManagerTemp";
+import { LobbyManager } from "./lobbyManager";
 import { WebSocketMessage } from "../../shared/types";
 import { Connection } from "../../ports/out/connection";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
@@ -18,17 +18,17 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
     }
 
     public async handleJoinLobby(conn: Connection) {
-        conn.send("joined_lobby", { lobbyId: conn.lobbyId, message: "User joined" });
+        conn.send("joined_lobby", { lobbyCode: conn.lobbyCode, message: "User joined" });
     }
 
     public async handleFetchLeaderboard(conn: Connection, data: WebSocketMessage) {
-        if (!conn.lobbyId) {
+        if (!conn.lobbyCode) {
             conn.send("error", { message: "You must join a lobby before voting!" });
             return;
         }
         try {
-            const leaderboard = await this.leaderboardService.getLeaderboard(conn.lobbyId, 10);
-            this.lobbyManager.broadcastToLobby(conn.lobbyId, "update_leaderboard", leaderboard)
+            const leaderboard = await this.leaderboardService.getLeaderboard(conn.lobbyCode, 10);
+            this.lobbyManager.broadcastToLobby(conn.lobbyCode, "update_leaderboard", leaderboard)
         } catch (error) {
             console.error("❌ Error fetching leaderboard:", error);
             conn.send("error", { message: "Failed to retrieve leaderboard" });
@@ -36,13 +36,13 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
     } 
     
     public async handleVoteMeal(conn: Connection, data: WebSocketMessage) {
-        if (!conn.lobbyId) {
+        if (!conn.lobbyCode) {
             conn.send("error", {message: "You must join a lobby before voting!" });
         return;
         }
 
         if (data.type !== "vote_meal") return;
 
-        await this.leaderboardService.voteMeal(data.userId ,data.mealId, conn.lobbyId, data.score);
+        await this.leaderboardService.voteMeal(data.userId ,data.mealId, conn.lobbyCode, data.score);
     }
 }

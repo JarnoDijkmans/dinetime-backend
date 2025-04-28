@@ -5,8 +5,8 @@ import "./infrastructure/flushVotesToDatabase";
 import { WebSocketGateway } from "./presentation/websocket/webSocketGateway";
 import { LeaderboardService } from "./application/services/leaderboardService";
 import { RedisRepository } from "./infrastructure/repository/redisRepository";
-import { LobbyManager } from "./application/websocket/lobbyManagerTemp";
-import { WebsocketMessageHandler } from "./application/websocket/websocketMessageHandlerTemp";
+import { LobbyManager } from "./application/websocket/lobbyManager";
+import { WebsocketMessageHandler } from "./application/websocket/websocketMessageHandler";
 import { WebSocketServer } from "ws";
 
 const app = express();
