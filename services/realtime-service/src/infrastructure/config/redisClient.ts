@@ -3,7 +3,6 @@ import Redis from "ioredis";
 let redisClientInstance: Redis | null = null;
 let redisSubscriberInstance: Redis | null = null;
 
-// ✅ Function to get Redis client (lazy-loads the instance)
 export function getRedisClient(): Redis {
     if (!redisClientInstance) {
         redisClientInstance = new Redis({
@@ -18,7 +17,6 @@ export function getRedisClient(): Redis {
     return redisClientInstance;
 }
 
-// ✅ Function to get Redis Subscriber (lazy-loads the instance)
 export function getRedisSubscriber(): Redis {
     if (!redisSubscriberInstance) {
         redisSubscriberInstance = new Redis({
@@ -32,7 +30,6 @@ export function getRedisSubscriber(): Redis {
     return redisSubscriberInstance;
 }
 
-// ✅ Function to properly close all Redis connections
 export async function closeRedisConnections() {
     if (redisClientInstance) {
         await redisClientInstance.quit();

@@ -1,7 +1,7 @@
 
 import { WebSocketServer } from "ws";
 import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
-import { LobbyManager } from "./lobbyManager";
+import { LobbyManager } from "./lobbyManagerTemp";
 import { WebSocketMessage } from "../../shared/types";
 import { Connection } from "../../ports/out/connection";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
@@ -18,7 +18,7 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
     }
 
     public async handleJoinLobby(conn: Connection) {
-        conn.send("join_lobby", { lobbyId: conn.lobbyId, message: "User joined" });
+        conn.send("joined_lobby", { lobbyId: conn.lobbyId, message: "User joined" });
     }
 
     public async handleFetchLeaderboard(conn: Connection, data: WebSocketMessage) {

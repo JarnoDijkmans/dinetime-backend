@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-
   ranking-service:
     build:
       context: ./services/ranking-service
@@ -27,13 +26,14 @@ services:
     volumes:
       - ranking-mysql-data:/var/lib/mysql
 
+
   realtime-service:
     build:
       context: ./services/realtime-service
       target: prod              
     container_name: realtime-service
     ports:
-      - "5000:5000"
+      - "5002:5000"
     environment:
       - NODE_ENV=production
       - PORT=5000
@@ -71,18 +71,17 @@ services:
     volumes:
       - redis-data:/data
     command: ["redis-server", "--appendonly", "yes"]
-    networks:
-    - dinetime-network
 
   redis-test:
     image: redis:latest
     container_name: redis-test
     ports:
-      - "6380:6379"  # ✅ Test Redis on port 6380
+      - "6380:6379" 
     command: ["redis-server", "--appendonly", "yes"]
 
 volumes:
   redis-data:
   ranking-mysql-data:
   matchmaker-mysql-data:  
+
 
