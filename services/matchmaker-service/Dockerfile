@@ -1,14 +1,11 @@
-FROM python:3.11-slim
+FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY build/libs/matchmaker-0.0.1-SNAPSHOT.jar app.jar
 
-RUN pip install --upgrade pip \
- && pip install --no-cache-dir -r requirements.txt
+EXPOSE 8080
 
-COPY . .
+ENV SPRING_PROFILES_ACTIVE=docker
 
-EXPOSE 8000
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
