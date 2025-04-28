@@ -41,3 +41,13 @@ node_modules/
 *.js.map
 dist/
 build/
+
+# Gradle
+.gradle/
+**/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+gradle/wrapper/gradle-wrapper.jar
+gradle-wrapper.properties
+
+# macOS system files
+.DS_Store
