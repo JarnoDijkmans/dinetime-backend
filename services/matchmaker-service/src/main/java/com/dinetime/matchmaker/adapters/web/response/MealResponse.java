@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class MealResponse {
+        private String id;
         private String title;
         private List<String> cuisines;
         private List<String> ingredients;
