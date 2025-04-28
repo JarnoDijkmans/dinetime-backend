@@ -1,7 +1,7 @@
 
 import { WebSocketServer } from "ws";
 import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
-import { LobbyManager } from "./lobbyManager";
+import { LobbyManager } from "./lobbyManagerTemp";
 import { WebSocketMessage } from "../../shared/types";
 import { Connection } from "../../ports/out/connection";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
