@@ -8,11 +8,11 @@ export class LeaderboardService implements LeaderboardServicePort {
         this.leaderboardRepository = leaderboardRepository;
     }
 
-    async getLeaderboard(lobbyId: number, limit: number) {
-        return await this.leaderboardRepository.getLeaderboard(lobbyId, limit);
+    async getLeaderboard(lobbyCode: string, limit: number) {
+        return await this.leaderboardRepository.getLeaderboard(lobbyCode, limit);
     }
 
-    async voteMeal(userId: number, mealId: number, lobbyId: number, score: number) {
-        return await this.leaderboardRepository.voteMeal(userId, mealId, lobbyId, score);
+    async voteMeal(userId: number, mealId: number, lobbyCode: string, score: number) {
+        return await this.leaderboardRepository.voteMeal(userId, mealId, lobbyCode, score);
     }
 }

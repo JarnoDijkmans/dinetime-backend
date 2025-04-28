@@ -1,4 +1,4 @@
 export interface Connection {
-    lobbyId: number;
+    lobbyCode: string;
     send(type: string, payload: object): void;
 }

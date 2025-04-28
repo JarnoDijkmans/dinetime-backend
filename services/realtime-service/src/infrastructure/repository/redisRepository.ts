@@ -4,8 +4,8 @@ import { getRedisClient  } from "../config/redisClient";
 export class RedisRepository implements LeaderboardPort {
     private redis = getRedisClient(); 
 
-    async getLeaderboard(lobbyId: number, limit: number): Promise<{ mealId: number; score: number }[]> {
-        const leaderboardKey = `leaderboard:${lobbyId}`;
+    async getLeaderboard(lobbyCode: string, limit: number): Promise<{ mealId: number; score: number }[]> {
+        const leaderboardKey = `leaderboard:${lobbyCode}`;
     
         const rawData = await this.redis.zrevrangebyscore(
             leaderboardKey, "+inf", "-inf", "WITHSCORES", "LIMIT", 0, limit
@@ -22,14 +22,14 @@ export class RedisRepository implements LeaderboardPort {
         return formattedData;
     }
 
-    async getUserVote(userId: number, mealId: number, lobbyId: number): Promise<number | null> {
-        const key = `vote:${userId}:${mealId}:${lobbyId}`;
+    async getUserVote(userId: number, mealId: number, lobbyCode: string): Promise<number | null> {
+        const key = `vote:${userId}:${mealId}:${lobbyCode}`;
         const score = await this.redis.get(key);
         return score ? parseFloat(score) : null;
     }
 
-    async canUserVote(lobbyId: number): Promise<boolean> {
-        const timeRemaining = await this.redis.ttl(`leaderboard:${lobbyId}`);
+    async canUserVote(lobbyCode: string): Promise<boolean> {
+        const timeRemaining = await this.redis.ttl(`leaderboard:${lobbyCode}`);
     
         if (timeRemaining === -2) {
             return false; 
@@ -39,10 +39,10 @@ export class RedisRepository implements LeaderboardPort {
         return true;
     }
 
-    async voteMeal(userId: number, mealId: number, lobbyId: number, newScore: number) {
-        const leaderboardKey = `leaderboard:${lobbyId}`;
-        const pendingVotesKey = `pending_votes:${lobbyId}`;
-        const userVoteKey = `vote:${userId}:${mealId}:${lobbyId}`;
+    async voteMeal(userId: number, mealId: number, lobbyCode: string, newScore: number) {
+        const leaderboardKey = `leaderboard:${lobbyCode}`;
+        const pendingVotesKey = `pending_votes:${lobbyCode}`;
+        const userVoteKey = `vote:${userId}:${mealId}:${lobbyCode}`;
 
         const exists = await this.redis.exists(leaderboardKey);
         if (!exists) {
@@ -53,7 +53,7 @@ export class RedisRepository implements LeaderboardPort {
             await this.redis.expire(leaderboardKey, 50400); 
         }
 
-        const existingVote = await this.getUserVote(userId, mealId, lobbyId);
+        const existingVote = await this.getUserVote(userId, mealId, lobbyCode);
 
         if (existingVote !== null) {
             console.log('🔄 User previously voted:', existingVote);
@@ -78,7 +78,7 @@ export class RedisRepository implements LeaderboardPort {
 
             await this.redis.hset(pendingVotesKey, mealId.toString(), updatedPendingTotal.toString());
 
-            console.log(`📢 Updated pending_votes_db: Meal ${mealId} in lobby ${lobbyId} now has ${updatedPendingTotal}`);
+            console.log(`📢 Updated pending_votes_db: Meal ${mealId} in lobby ${lobbyCode} now has ${updatedPendingTotal}`);
         }
     }
 }
