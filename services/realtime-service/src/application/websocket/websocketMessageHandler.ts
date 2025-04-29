@@ -5,6 +5,7 @@ import { LobbyManager } from "./lobbyManager";
 import { WebSocketMessage } from "../../shared/types";
 import { Connection } from "../../ports/out/connection";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
+import { LobbyConnection } from "../../infrastructure/lobbyConnectionTemp";
 
 export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
     private leaderboardService: LeaderboardServicePort;
@@ -17,25 +18,39 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
         this.lobbyManager = lobbyManager;
     }
 
-    public async handleJoinLobby(conn: Connection) {
+    public async handleJoinLobby(conn: LobbyConnection) {
+        this.lobbyManager.addConnection(conn);
+        console.log("User joined lobby:", conn.lobbyCode);
         conn.send("joined_lobby", { lobbyCode: conn.lobbyCode, message: "User joined" });
-    }
+    }  
 
-    public async handleFetchLeaderboard(conn: Connection, data: WebSocketMessage) {
+    public async handleFetchLeaderboard(conn: LobbyConnection, data: WebSocketMessage) {
         if (!conn.lobbyCode) {
-            conn.send("error", { message: "You must join a lobby before voting!" });
-            return;
+          conn.send("error", { message: "You must join a lobby before voting!" });
+          return;
         }
+      
         try {
-            const leaderboard = await this.leaderboardService.getLeaderboard(conn.lobbyCode, 10);
-            this.lobbyManager.broadcastToLobby(conn.lobbyCode, "update_leaderboard", leaderboard)
+          const leaderboardArray = await this.leaderboardService.getLeaderboard(conn.lobbyCode, 10);
+          console.log("Leaderboard fetched:", leaderboardArray);
+      
+          const leaderboardObject = Object.fromEntries(
+            leaderboardArray
+              .sort((a, b) => b.score - a.score) 
+              .map(({ mealId, score }) => [mealId, score])
+          );
+      
+          this.lobbyManager.broadcastToLobby(conn.lobbyCode, "update_leaderboard", {
+            leaderboard: leaderboardObject
+          });
         } catch (error) {
-            console.error("❌ Error fetching leaderboard:", error);
-            conn.send("error", { message: "Failed to retrieve leaderboard" });
+          console.error("❌ Error fetching leaderboard:", error);
+          conn.send("error", { message: "Failed to retrieve leaderboard" });
         }
-    } 
+      }
+      
     
-    public async handleVoteMeal(conn: Connection, data: WebSocketMessage) {
+    public async handleVoteMeal(conn: LobbyConnection, data: WebSocketMessage) {
         if (!conn.lobbyCode) {
             conn.send("error", {message: "You must join a lobby before voting!" });
         return;
