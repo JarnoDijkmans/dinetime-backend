@@ -49,5 +49,4 @@ build/
 build/
 *.lock
 *.bin
-*.properties
 
