@@ -126,20 +126,19 @@ jobs:
       - name: Build All Services
         run: docker compose build
 
-      # Example: Push Matchmaker Image
       - name: Push Matchmaker Image
         run: |
-          docker tag matchmaker-service dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
+          docker tag dinetime-backend-matchmaker-service dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
           docker push dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
 
-      # Example: Push Ranking Image
+
       - name: Push Ranking Image
         run: |
-          docker tag ranking-service dockerjarnodijkmans/ranking-service:${{ github.sha }}
+          docker tag dinetime-backend-ranking-service dockerjarnodijkmans/ranking-service:${{ github.sha }}
           docker push dockerjarnodijkmans/ranking-service:${{ github.sha }}
 
-      # Example: Push Realtime Image
+
       - name: Push Realtime Image
         run: |
-          docker tag realtime-service dockerjarnodijkmans/realtime-service:${{ github.sha }}
+          docker tag dinetime-backend-realtime-service dockerjarnodijkmans/realtime-service:${{ github.sha }}
           docker push dockerjarnodijkmans/realtime-service:${{ github.sha }}
