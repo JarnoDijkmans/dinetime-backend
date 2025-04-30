@@ -6,7 +6,7 @@ let redisSubscriberInstance: Redis | null = null;
 export function getRedisClient(): Redis {
     if (!redisClientInstance) {
         redisClientInstance = new Redis({
-            host: process.env.REDIS_HOST || "localhost",
+            host: process.env.REDIS_HOST ?? "localhost",
             port: Number(process.env.REDIS_PORT) || 6379,
             retryStrategy: (times) => Math.min(times * 50, 2000),
         });
@@ -20,7 +20,7 @@ export function getRedisClient(): Redis {
 export function getRedisSubscriber(): Redis {
     if (!redisSubscriberInstance) {
         redisSubscriberInstance = new Redis({
-            host: process.env.REDIS_HOST || "localhost",
+            host: process.env.REDIS_HOST ?? "localhost",
             port: Number(process.env.REDIS_PORT) || 6379,
             retryStrategy: (times) => Math.min(times * 50, 2000),
         });

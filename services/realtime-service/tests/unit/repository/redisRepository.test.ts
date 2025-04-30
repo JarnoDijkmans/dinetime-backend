@@ -23,34 +23,34 @@ describe("RedisRepository Integration Tests (Mocked Redis)", () => {
     });
 
     test("voteMeal should update leaderboard", async () => {
-        await redisRepo.voteMeal(4, 5, 6, 10);
+        await redisRepo.voteMeal("4", "5", "6", 10);
         const score = await redis.zscore("leaderboard:6", "5");
         expect(score).toBe("10");
     });
 
     test("voteMeal on the same meal/lobby but different user", async () => {
-        await redisRepo.voteMeal(4, 5, 6, 10);
-        await redisRepo.voteMeal(5, 5, 6, 20);
+        await redisRepo.voteMeal("4", "5", "6", 10);
+        await redisRepo.voteMeal("5", "5", "6", 20);
         const totalScore = await redis.zscore("leaderboard:6", "5");
         expect(totalScore).toBe("30");
     });
 
     test("voteMeal: user updates existing vote", async () => {
-        await redisRepo.voteMeal(7, 8, 9, 5);
-        await redisRepo.voteMeal(7, 8, 9, 10);
+        await redisRepo.voteMeal("7", "8", "9", 5);
+        await redisRepo.voteMeal("7", "8", "9", 10);
         const score = await redis.zscore("leaderboard:9", "8");
         expect(score).toBe("10");
     });
 
     test("canUserVote should return false if leaderboard expired", async () => {
-        await redisRepo.voteMeal(7, 8, 9, 5);
+        await redisRepo.voteMeal("7", "8", "9", 5);
         await redis.expire("leaderboard:9", -2);
-        const canVote = await redisRepo.canUserVote(9);
+        const canVote = await redisRepo.canUserVote("9");
         expect(canVote).toBe(false);
     });
 
     test("canUserVote: returns false when leaderboard doesn't exist", async () => {
-        const canVote = await redisRepo.canUserVote(999);
+        const canVote = await redisRepo.canUserVote("999");
         expect(canVote).toBe(false);
     });
 });

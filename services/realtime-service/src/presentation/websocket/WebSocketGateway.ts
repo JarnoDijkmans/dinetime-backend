@@ -2,11 +2,11 @@ import { WebSocketServer } from "ws";
 import { WebSocketMessage } from "../../shared/types";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
 import { Connection } from "../../ports/out/connection";
-import { LobbyConnection } from "../../infrastructure/lobbyConnectionTemp";
+import { LobbyConnection } from "../../infrastructure/lobbyConnection";
 
 export class WebSocketGateway {
-    private wss: WebSocketServer;
-    private messageHandler: WebSocketMessageHandlerPort;
+    private readonly wss: WebSocketServer;
+    private readonly messageHandler: WebSocketMessageHandlerPort;
 
     constructor(wss: WebSocketServer, messageHandler: WebSocketMessageHandlerPort) {
         this.wss = wss;

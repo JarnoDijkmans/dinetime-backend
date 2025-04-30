@@ -1,4 +1,4 @@
 export interface LeaderboardServicePort {
-    getLeaderboard(lobbyCode: string, limit: number): Promise<Array<{ mealId: number; score: number }>>;
-    voteMeal(userId: number, mealId: number, lobbyCode: string, score: number): Promise<void>;
+    getLeaderboard(lobbyCode: string, limit: number): Promise<Array<{ mealId: string; score: number }>>;
+    voteMeal(userId: string, mealId: string, lobbyCode: string, score: number): Promise<void>;
 }

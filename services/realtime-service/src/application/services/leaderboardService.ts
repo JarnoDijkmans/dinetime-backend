@@ -2,7 +2,7 @@ import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
 import { LeaderboardPort } from "../../ports/out/leaderboardPort";
 
 export class LeaderboardService implements LeaderboardServicePort {
-    private leaderboardRepository: LeaderboardPort;
+    private readonly leaderboardRepository: LeaderboardPort;
 
     constructor(leaderboardRepository: LeaderboardPort) {
         this.leaderboardRepository = leaderboardRepository;
@@ -12,7 +12,7 @@ export class LeaderboardService implements LeaderboardServicePort {
         return await this.leaderboardRepository.getLeaderboard(lobbyCode, limit);
     }
 
-    async voteMeal(userId: number, mealId: number, lobbyCode: string, score: number) {
+    async voteMeal(userId: string, mealId: string, lobbyCode: string, score: number) {
         return await this.leaderboardRepository.voteMeal(userId, mealId, lobbyCode, score);
     }
 }

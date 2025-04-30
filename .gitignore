@@ -50,3 +50,22 @@ build/
 *.lock
 *.bin
 
+# Jest & Coverage
+coverage/
+*.lcov
+lcov.info
+coverage-final.json
+clover.xml
+index.html
+base.css
+
+# Sonar
+.sonar/
+*.udg
+*_ts.ucfgs
+.sonar_lock
+.scannerwork/
+report-task.txt
+
+# Logs
+*.log

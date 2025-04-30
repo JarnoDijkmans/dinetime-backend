@@ -1,7 +1,7 @@
-import { LobbyConnection } from "../../infrastructure/lobbyConnectionTemp";
+import { LobbyConnection } from "../../infrastructure/lobbyConnection";
 
 export class LobbyManager{
-    private lobbies: Map<string, Set<LobbyConnection>> = new Map();
+    private readonly lobbies: Map<string, Set<LobbyConnection>> = new Map();
 
     addConnection(conn: LobbyConnection) {
         const lobbyCode = conn.lobbyCode;
