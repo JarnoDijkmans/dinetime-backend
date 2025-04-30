@@ -15,12 +15,12 @@ export async function createLeaderboardSubscriber(wss: WebSocketServer) {
     redisSubscriber.on("message", (channel, message) => {
         if (channel === "leaderboardUpdate") {
             try {
-                const { lobbyId } = JSON.parse(message);
-                console.log(`🔄 Leaderboard updated for lobby ${lobbyId}`);
+                const { lobbyCode } = JSON.parse(message);
+                console.log(`🔄 Leaderboard updated for lobby ${lobbyCode}`);
 
                 wss.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({ type: "leaderboard_update", lobbyId }));
+                        client.send(JSON.stringify({ type: "leaderboard_update", lobbyCode }));
                     }
                 });
             } catch (error) {

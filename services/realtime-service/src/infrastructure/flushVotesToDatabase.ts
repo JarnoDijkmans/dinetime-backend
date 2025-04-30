@@ -7,7 +7,7 @@ export async function flushLeaderboardsToRankingService() {
 
         const isProcessing = await redis.get("processing_lock");
         if (isProcessing) {
-            console.log("🔒 Already processing, skipping this run.");
+            console.log("Already processing, skipping this run.");
             return;
         }
 
@@ -23,7 +23,7 @@ export async function flushLeaderboardsToRankingService() {
         const leaderboards: Record<string, { mealId: number; totalScore: number }[]> = {};
 
         for (const key of keys) {
-            const lobbyId = key.split(":")[1]; 
+            const lobbyCode = key.split(":")[1]; 
             const meals = await redis.hgetall(key);
 
             const validMeals = Object.entries(meals)
@@ -34,7 +34,7 @@ export async function flushLeaderboardsToRankingService() {
                 }));
 
             if (validMeals.length > 0) {
-                leaderboards[lobbyId] = validMeals;
+                leaderboards[lobbyCode] = validMeals;
             }
         }
 
@@ -50,9 +50,9 @@ export async function flushLeaderboardsToRankingService() {
                 await redis.del(key);
             }
 
-            console.log(`💾 Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
+            console.log(`Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
         } catch (error) {
-            console.error("❌ Error sending leaderboards to ranking-service:", error);
+            console.error("Error sending leaderboards to ranking-service:", error);
         }
 
         await redis.del("processing_lock");

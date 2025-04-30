@@ -1,13 +1,13 @@
 export type WebSocketMessage =
-    | { type: "join_lobby"; lobbyId: number }
-    | { type: "fetch_leaderboard"; lobbyId: number }
-    | { type: "vote_meal"; userId: number; mealId: number; score: number };
+    | { type: "join_lobby"; lobbyCode: string }
+    | { type: "fetch_leaderboard"; lobbyCode: string }
+    | { type: "vote_meal"; userId: string; mealId: string; score: number };
 
 
     export interface Vote {
-        userId: number;   
-        mealId: number;   
-        lobbyId: number;  
+        userId: string;   
+        mealId: string;   
+        lobbyCode: string;  
         score: number;
     }
     
