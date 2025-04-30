@@ -4,8 +4,10 @@ import { execSync } from "child_process";
 
 const isCI = process.env.CI === "true";
 
-if (!isCI) {
-  describe("RedisRepository AOF Tests", () => {
+if (isCI) {
+    test.skip("Redis AOF integration test skipped in CI", () => {});
+  } else {
+    describe("RedisRepository AOF Tests", () => {
     let redisRepo: RedisRepository;
     let redis: Redis;
 
