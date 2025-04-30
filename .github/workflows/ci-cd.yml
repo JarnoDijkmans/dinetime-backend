@@ -1,0 +1,127 @@
+name: CI/CD Pipeline with SonarCloud
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matchmaker_changed: ${{ steps.filter.outputs.matchmaker }}
+      ranking_changed: ${{ steps.filter.outputs.ranking }}
+      realtime_changed: ${{ steps.filter.outputs.realtime }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            matchmaker:
+              - 'services/matchmaker-service/**'
+            ranking:
+              - 'services/ranking-service/**'
+            realtime:
+              - 'services/realtime-service/**'
+
+  run-tests-and-analysis:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.matchmaker_changed == 'true' || 
+        needs.detect-changes.outputs.ranking_changed == 'true' || 
+        needs.detect-changes.outputs.realtime_changed == 'true'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Matchmaker Tests + Sonar
+      - name: Run Matchmaker Tests
+        if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+        run: ./gradlew test
+        working-directory: services/matchmaker-service
+
+      - name: Analyze Matchmaker with SonarCloud
+        if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        working-directory: services/matchmaker-service
+
+      # Ranking Tests + Sonar
+      - name: Run Ranking Tests
+        if: needs.detect-changes.outputs.ranking_changed == 'true'
+        run: ./gradlew test
+        working-directory: services/ranking-service
+
+      - name: Analyze Ranking with SonarCloud
+        if: needs.detect-changes.outputs.ranking_changed == 'true'
+        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        working-directory: services/ranking-service
+
+      # Realtime Tests + Sonar
+      - name: Run Realtime Tests
+        if: needs.detect-changes.outputs.realtime_changed == 'true'
+        run: |
+          npm ci
+          npm test
+        working-directory: services/realtime-service
+
+      - name: Analyze Realtime with SonarCloud
+        if: needs.detect-changes.outputs.realtime_changed == 'true'
+        uses: SonarSource/sonarcloud-github-action@v2.2
+        with:
+          projectBaseDir: services/realtime-service
+          organization: your-organization
+          projectKey: your-realtime-project-key
+          token: ${{ secrets.SONAR_TOKEN }}
+
+
+  build-and-deploy:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build All Services
+        run: docker-compose build
+
+      # Example: Push Matchmaker Image
+      - name: Push Matchmaker Image
+        run: |
+          docker tag matchmaker-service dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
+          docker push dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
+
+      # Example: Push Ranking Image
+      - name: Push Ranking Image
+        run: |
+          docker tag ranking-service dockerjarnodijkmans/ranking-service:${{ github.sha }}
+          docker push dockerjarnodijkmans/ranking-service:${{ github.sha }}
+
+      # Example: Push Realtime Image
+      - name: Push Realtime Image
+        run: |
+          docker tag realtime-service dockerjarnodijkmans/realtime-service:${{ github.sha }}
+          docker push dockerjarnodijkmans/realtime-service:${{ github.sha }}
