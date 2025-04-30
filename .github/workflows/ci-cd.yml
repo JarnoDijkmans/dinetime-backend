@@ -119,8 +119,9 @@ jobs:
 
       - name: Build Java Services
         run: |
-          ./gradlew :services/matchmaker-service:bootJar
-          ./gradlew :services/ranking-service:bootJar
+          cd services/matchmaker-service && ./gradlew bootJar && cd ../..
+          cd services/ranking-service && ./gradlew bootJar && cd ../..
+      
       
       - name: Build All Services
         run: docker compose build
