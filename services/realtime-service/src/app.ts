@@ -2,7 +2,7 @@ import "dotenv/config";
 import http from "http";
 import express from "express";
 import "./infrastructure/flushVotesToDatabase";
-import { WebSocketGateway } from "./presentation/websocket/webSocketGateway";
+import { WebSocketGateway } from "./presentation/websocket/websocketGateway";
 import { LeaderboardService } from "./application/services/leaderboardService";
 import { RedisRepository } from "./infrastructure/repository/redisRepository";
 import { LobbyManager } from "./application/websocket/lobbyManager";
