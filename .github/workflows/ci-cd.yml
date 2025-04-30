@@ -87,8 +87,8 @@ jobs:
         with:
           projectBaseDir: services/realtime-service
           args: >
-            -Dsonar.organization=dinetime-org
-            -Dsonar.projectKey=dinetime-realtime
+            -Dsonar.organization=dinetime-sonar
+            -Dsonar.projectKey=dinetime-sonar_realtime-service
             -Dsonar.host.url=https://sonarcloud.io
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
