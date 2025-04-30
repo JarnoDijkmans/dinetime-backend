@@ -18,13 +18,16 @@ jobs:
       matchmaker_changed: ${{ steps.filter.outputs.matchmaker }}
       ranking_changed: ${{ steps.filter.outputs.ranking }}
       realtime_changed: ${{ steps.filter.outputs.realtime }}
+      ci: ${{ steps.filter.outputs.ci }}
     steps:
       - uses: actions/checkout@v3
+
       - name: Detect changes
         id: filter
         uses: dorny/paths-filter@v3
         with:
-          base: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+          base: ${{ github.event.before }}
+          ref: ${{ github.sha }}
           filters: |
             matchmaker:
               - 'services/matchmaker-service/**'
@@ -36,6 +39,7 @@ jobs:
               - '.github/workflows/**'
               - 'ci-cd.yml'
               - '*.md'
+
 
 
   run-tests-and-analysis:
