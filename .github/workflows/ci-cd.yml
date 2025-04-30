@@ -31,6 +31,11 @@ jobs:
               - 'services/ranking-service/**'
             realtime:
               - 'services/realtime-service/**'
+            ci:
+              - '.github/workflows/**'
+              - 'ci-cd.yml'
+              - '*.md'
+
 
   run-tests-and-analysis:
     needs: detect-changes
