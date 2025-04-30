@@ -83,13 +83,15 @@ jobs:
         working-directory: services/realtime-service
 
       - name: Analyze Realtime with SonarCloud
-        if: needs.detect-changes.outputs.realtime_changed == 'true'
         uses: SonarSource/sonarcloud-github-action@v2.2
         with:
           projectBaseDir: services/realtime-service
-          organization: your-organization
-          projectKey: your-realtime-project-key
-          token: ${{ secrets.SONAR_TOKEN }}
+          args: >
+            -Dsonar.organization=dinetime-org
+            -Dsonar.projectKey=dinetime-realtime
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+      
 
 
   build-and-deploy:
