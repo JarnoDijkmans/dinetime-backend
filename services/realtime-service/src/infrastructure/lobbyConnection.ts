@@ -2,7 +2,7 @@ import { Connection } from "../ports/out/connection";
 import WebSocket from "ws";
 
 export class LobbyConnection implements Connection {
-    private socket: WebSocket;
+    private readonly socket: WebSocket;
     private _lobbyCode: string | null = null;
   
     constructor(socket: WebSocket) {

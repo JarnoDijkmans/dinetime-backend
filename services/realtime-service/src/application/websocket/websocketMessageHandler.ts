@@ -3,14 +3,13 @@ import { WebSocketServer } from "ws";
 import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
 import { LobbyManager } from "./lobbyManager";
 import { WebSocketMessage } from "../../shared/types";
-import { Connection } from "../../ports/out/connection";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
-import { LobbyConnection } from "../../infrastructure/lobbyConnectionTemp";
+import { LobbyConnection } from "../../infrastructure/lobbyConnection";
 
 export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
-    private leaderboardService: LeaderboardServicePort;
-    private wss: WebSocketServer;
-    private lobbyManager: LobbyManager;
+    private readonly leaderboardService: LeaderboardServicePort;
+    private readonly wss: WebSocketServer;
+    private readonly lobbyManager: LobbyManager;
 
     constructor(leaderboardService: LeaderboardServicePort, wss: WebSocketServer, lobbyManager: LobbyManager ) {
         this.leaderboardService = leaderboardService;
@@ -18,7 +17,7 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
         this.lobbyManager = lobbyManager;
     }
 
-    public async handleJoinLobby(conn: LobbyConnection) {
+    public handleJoinLobby(conn: LobbyConnection) {
         this.lobbyManager.addConnection(conn);
         console.log("User joined lobby:", conn.lobbyCode);
         conn.send("joined_lobby", { lobbyCode: conn.lobbyCode, message: "User joined" });
@@ -34,11 +33,11 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
           const leaderboardArray = await this.leaderboardService.getLeaderboard(conn.lobbyCode, 10);
           console.log("Leaderboard fetched:", leaderboardArray);
       
+          const sortedLeaderboard = leaderboardArray.slice().sort((a, b) => b.score - a.score);
           const leaderboardObject = Object.fromEntries(
-            leaderboardArray
-              .sort((a, b) => b.score - a.score) 
-              .map(({ mealId, score }) => [mealId, score])
+            sortedLeaderboard.map(({ mealId, score }) => [mealId, score])
           );
+          
       
           this.lobbyManager.broadcastToLobby(conn.lobbyCode, "update_leaderboard", {
             leaderboard: leaderboardObject

@@ -2,7 +2,11 @@ import { LeaderboardPort } from "../../ports/out/leaderboardPort";
 import { getRedisClient  } from "../config/redisClient"; 
 
 export class RedisRepository implements LeaderboardPort {
-    private redis = getRedisClient(); 
+    private readonly redis: any;
+
+    constructor(redisClient?: any) {
+      this.redis = redisClient ?? getRedisClient();
+    }
 
     async getLeaderboard(lobbyCode: string, limit: number): Promise<{ mealId: string; score: number }[]> {
         const leaderboardKey = `leaderboard:${lobbyCode}`;
@@ -30,14 +34,9 @@ export class RedisRepository implements LeaderboardPort {
 
     async canUserVote(lobbyCode: string): Promise<boolean> {
         const timeRemaining = await this.redis.ttl(`leaderboard:${lobbyCode}`);
-    
-        if (timeRemaining === -2) {
-            return false; 
-        } else if (timeRemaining <= 7200) {
-            return false; 
-        }
-        return true;
-    }
+        return timeRemaining > 7200;
+      }
+      
 
     async voteMeal(userId: string, mealId: string, lobbyCode: string, newScore: number) {
         const leaderboardKey = `leaderboard:${lobbyCode}`;
@@ -70,7 +69,7 @@ export class RedisRepository implements LeaderboardPort {
             const existingPendingTotal = await this.redis.hget(pendingVotesKey, mealId.toString());
 
             const updatedPendingTotal = existingPendingTotal
-                ? parseFloat(existingPendingTotal) - (existingVote || 0) + newScore
+                ? parseFloat(existingPendingTotal) - (existingVote ?? 0) + newScore
                 : realTimeTotalScore;
 
             await this.redis.hset(pendingVotesKey, mealId.toString(), updatedPendingTotal.toString());

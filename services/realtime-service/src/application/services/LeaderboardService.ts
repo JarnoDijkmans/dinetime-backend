@@ -2,7 +2,7 @@ import { LeaderboardServicePort } from "../../ports/in/leaderboardServicePort";
 import { LeaderboardPort } from "../../ports/out/leaderboardPort";
 
 export class LeaderboardService implements LeaderboardServicePort {
-    private leaderboardRepository: LeaderboardPort;
+    private readonly leaderboardRepository: LeaderboardPort;
 
     constructor(leaderboardRepository: LeaderboardPort) {
         this.leaderboardRepository = leaderboardRepository;
