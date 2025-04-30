@@ -5,8 +5,8 @@ import { Connection } from "../../ports/out/connection";
 import { LobbyConnection } from "../../infrastructure/lobbyConnection";
 
 export class WebSocketGateway {
-    private wss: WebSocketServer;
-    private messageHandler: WebSocketMessageHandlerPort;
+    private readonly wss: WebSocketServer;
+    private readonly messageHandler: WebSocketMessageHandlerPort;
 
     constructor(wss: WebSocketServer, messageHandler: WebSocketMessageHandlerPort) {
         this.wss = wss;
@@ -36,10 +36,32 @@ export class WebSocketGateway {
 
             switch (data.type) {
                 case "join_lobby": 
-                conn.lobbyId = data.lobbyId;
-                this.messageHandler.handleJoinLobby(conn);
-                case "fetch_leaderboard": this.messageHandler.handleFetchLeaderboard(conn, data);
-                case "vote_meal": this.messageHandler.handleVoteMeal(conn, data);
+                    if (data.lobbyCode) {
+                        conn.lobbyCode = data.lobbyCode;
+                        this.messageHandler.handleJoinLobby(conn);
+                    } else {
+                        conn.send("error", { message: "Lobby ID not provided." });
+                    }
+                    break;
+
+                case "fetch_leaderboard": 
+                    if (conn.lobbyCode !== null) {
+                        this.messageHandler.handleFetchLeaderboard(conn, data);
+                    } else {
+                        conn.send("error", { message: "No active lobby. Please reconnect." });
+                    }
+                    break;
+
+                case "vote_meal": 
+                    if (conn.lobbyCode !== null) {
+                        this.messageHandler.handleVoteMeal(conn, data);
+                    } else {
+                        conn.send("error", { message: "No active lobby. Please reconnect." });
+                    }
+                    break;
+
+                default:
+                    conn.send("error", { message: "Unknown message type." });
             }
 
         } catch (error) {

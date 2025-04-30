@@ -11,7 +11,7 @@ jest.mock("../../src/infrastructure/config/redisClient", () => ({
 }));
 
 import { flushLeaderboardsToRankingService } from "../../src/infrastructure/flushVotesToDatabase";
-import { getRedisClient, closeRedisConnections } from "../../src/infrastructure/config/RedisClient";
+import { getRedisClient, closeRedisConnections } from "../../src/infrastructure/config/redisClient";
 
 
 describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", () => {

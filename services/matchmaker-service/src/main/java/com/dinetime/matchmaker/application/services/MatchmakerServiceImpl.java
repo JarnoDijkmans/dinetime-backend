@@ -40,6 +40,7 @@ public MatchResponse getPool(String gameCode) {
 
     List<MealResponse> mealResponses = match.getMeals().stream()
         .map(meal -> new MealResponse(
+            meal.getId(),
             meal.getTitle(),
             meal.getCuisines(),
             meal.getIngredients(),

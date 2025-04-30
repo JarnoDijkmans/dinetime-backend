@@ -23,7 +23,7 @@ export async function flushLeaderboardsToRankingService() {
         const leaderboards: Record<string, { mealId: number; totalScore: number }[]> = {};
 
         for (const key of keys) {
-            const lobbyId = key.split(":")[1]; 
+            const lobbyCode = key.split(":")[1]; 
             const meals = await redis.hgetall(key);
 
             const validMeals = Object.entries(meals)
@@ -34,7 +34,7 @@ export async function flushLeaderboardsToRankingService() {
                 }));
 
             if (validMeals.length > 0) {
-                leaderboards[lobbyId] = validMeals;
+                leaderboards[lobbyCode] = validMeals;
             }
         }
 

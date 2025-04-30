@@ -2,26 +2,28 @@ import { Connection } from "../ports/out/connection";
 import WebSocket from "ws";
 
 export class LobbyConnection implements Connection {
-    private socket: WebSocket;
-    private _lobbyId: number | null = null;
+    private readonly socket: WebSocket;
+    private _lobbyCode: string | null = null;
   
     constructor(socket: WebSocket) {
       this.socket = socket;
     }
   
     send(type: string, payload: object) {
-      this.socket.send(JSON.stringify({ type, ...payload }));
+      this.socket.send(JSON.stringify({ type, payload }));
     }
   
-    get lobbyId(): number {
-      if (this._lobbyId === null) {
-        throw new Error("lobbyId has not been set yet.");
+    get lobbyCode(): string {
+      if (this._lobbyCode === null) {
+        this.socket.send(JSON.stringify({ type: "error", message: "No active lobby. Please reconnect." }));
+        throw new Error("No active lobby. Please reconnect.");
       }
-      return this._lobbyId;
+      return this._lobbyCode;
     }
+    
   
-    set lobbyId(id: number) {
-      this._lobbyId = id;
+    set lobbyCode(id: string) {
+      this._lobbyCode = id;
     }
   }
   
