@@ -1,12 +1,13 @@
-package com.dinetime.ranking.presentation.controller;
-import com.dinetime.ranking.application.port.ILeaderboardService;
-import com.dinetime.ranking.presentation.response.LeaderboardResponseModel;
+package com.dinetime.ranking.adapters.web.controller;
+import com.dinetime.ranking.adapters.web.request.LeaderboardsRequestModel;
+import com.dinetime.ranking.adapters.web.response.LeaderboardResponseModel;
+import com.dinetime.ranking.ports.input.ILeaderboardService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.dinetime.ranking.presentation.request.LeaderboardsRequestModel;
 
 
 @RestController

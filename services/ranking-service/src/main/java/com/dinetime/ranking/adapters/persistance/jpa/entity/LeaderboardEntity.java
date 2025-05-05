@@ -1,4 +1,4 @@
-package com.dinetime.ranking.infrasctructure.entities;
+package com.dinetime.ranking.adapters.persistance.jpa.entity;
 
 import com.dinetime.ranking.domain.model.Leaderboard;
 import com.dinetime.ranking.domain.model.LeaderboardItem;
@@ -19,13 +19,13 @@ public class LeaderboardEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private long lobbyId;
+    private String lobbyCode;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "leaderboard")
     private List<LeaderboardItemEntity> items;
 
-    public LeaderboardEntity(Long lobbyId, List<LeaderboardItemEntity> items) {
-        this.lobbyId = lobbyId;
+    public LeaderboardEntity(String lobbyCode, List<LeaderboardItemEntity> items) {
+        this.lobbyCode = lobbyCode;
         this.items = items;
     }
 
@@ -35,7 +35,7 @@ public class LeaderboardEntity {
 
             for (LeaderboardItemEntity existingItem : this.items) {
                 if (existingItem.getMealId() == newItem.getMealId()) {
-                    existingItem.replaceScore(newItem.getTotalScore()); // ✅ Replace only if changed
+                    existingItem.replaceScore(newItem.getTotalScore());
                     updated = true;
                     break;
                 }
@@ -49,7 +49,7 @@ public class LeaderboardEntity {
 
 
     public static LeaderboardEntity fromDomain(Leaderboard leaderboard) {
-        LeaderboardEntity entity = new LeaderboardEntity(leaderboard.getLobbyId(), new ArrayList<>());
+        LeaderboardEntity entity = new LeaderboardEntity(leaderboard.getLobbyCode(), new ArrayList<>());
 
         // ✅ Pass entity at creation
 
@@ -66,6 +66,6 @@ public class LeaderboardEntity {
                 .map(LeaderboardItemEntity::toDomain)
                 .collect(Collectors.toList());
 
-        return new Leaderboard(lobbyId, domainItems);
+        return new Leaderboard(lobbyCode, domainItems);
     }
 }

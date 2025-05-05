@@ -1,4 +1,4 @@
- package com.dinetime.ranking.domain.repository;
+ package com.dinetime.ranking.ports.output;
 
  import com.dinetime.ranking.domain.model.Leaderboard;
 

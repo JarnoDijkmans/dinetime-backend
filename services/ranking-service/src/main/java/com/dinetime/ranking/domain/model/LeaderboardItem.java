@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LeaderboardItem {
-    private final int mealId;
+    private final String mealId;
     private final int totalScore;
 }

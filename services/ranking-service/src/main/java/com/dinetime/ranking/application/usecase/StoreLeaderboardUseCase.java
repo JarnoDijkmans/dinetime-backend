@@ -1,10 +1,11 @@
-package com.dinetime.ranking.application.usecase.Leaderboard;
+package com.dinetime.ranking.application.usecase;
 
+import com.dinetime.ranking.adapters.web.request.LeaderboardsRequestModel;
+import com.dinetime.ranking.adapters.web.response.LeaderboardResponseModel;
 import com.dinetime.ranking.domain.model.Leaderboard;
 import com.dinetime.ranking.domain.model.LeaderboardItem;
-import com.dinetime.ranking.domain.repository.ILeaderboardRepository;
-import com.dinetime.ranking.presentation.request.LeaderboardsRequestModel;
-import com.dinetime.ranking.presentation.response.LeaderboardResponseModel;
+import com.dinetime.ranking.ports.output.ILeaderboardRepository;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,17 +22,14 @@ public class StoreLeaderboardUseCase {
 
     public LeaderboardResponseModel execute(LeaderboardsRequestModel requestModel) {
         try {
-            requestModel.getLeaderboards().forEach((lobbyId, entries) -> {
-                Leaderboard leaderboard = new Leaderboard(lobbyId, convertToDomain(entries));
+            requestModel.getLeaderboards().forEach((lobbyCode, entries) -> {
+                Leaderboard leaderboard = new Leaderboard(lobbyCode, convertToDomain(entries));
 
-                // ✅ Send to repository
                 leaderboardRepository.save(leaderboard);
             });
 
-            // ✅ If everything succeeds
             return new LeaderboardResponseModel(true, 200, "Leaderboards saved successfully.");
         } catch (Exception e) {
-            // ✅ Handle failure and return an error response
             return new LeaderboardResponseModel(false, 500, "Failed to save leaderboards: " + e.getMessage());
         }
     }

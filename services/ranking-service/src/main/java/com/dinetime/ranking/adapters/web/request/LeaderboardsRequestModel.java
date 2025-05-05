@@ -1,4 +1,4 @@
-package com.dinetime.ranking.presentation.request;
+package com.dinetime.ranking.adapters.web.request;
 
 import java.util.List;
 import java.util.Map;
@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LeaderboardsRequestModel {
-    private Map<Long, List<LeaderboardEntry>> leaderboards;
+    private Map<String, List<LeaderboardEntry>> leaderboards;
 
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class LeaderboardEntry {
-        private int mealId;
+        private String mealId;
         private int totalScore;
     }
 }

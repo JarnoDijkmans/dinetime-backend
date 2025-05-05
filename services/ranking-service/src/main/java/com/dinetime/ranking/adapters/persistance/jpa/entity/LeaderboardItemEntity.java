@@ -1,4 +1,4 @@
-package com.dinetime.ranking.infrasctructure.entities;
+package com.dinetime.ranking.adapters.persistance.jpa.entity;
 
 import com.dinetime.ranking.domain.model.LeaderboardItem;
 import jakarta.persistence.*;
@@ -14,14 +14,14 @@ public class LeaderboardItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private int mealId;
+    private String mealId;
     private int totalScore;
 
     @ManyToOne
     @JoinColumn(name = "leaderboard_id", nullable = false)
     private LeaderboardEntity leaderboard;
 
-    public LeaderboardItemEntity(int mealId, int totalScore, LeaderboardEntity leaderboard) {
+    public LeaderboardItemEntity(String mealId, int totalScore, LeaderboardEntity leaderboard) {
         this.mealId = mealId;
         this.totalScore = totalScore;
         this.leaderboard = leaderboard;

@@ -1,4 +1,4 @@
-package com.dinetime.ranking.presentation.response;
+package com.dinetime.ranking.adapters.web.response;
 
 
 import lombok.AllArgsConstructor;
