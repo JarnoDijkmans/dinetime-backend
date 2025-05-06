@@ -65,7 +65,7 @@ jobs:
       # Matchmaker Tests + Sonar
       - name: Run Matchmaker Tests
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
-        run: ./gradlew test
+        run: ./gradlew clean test jacocoTestReport
         working-directory: services/matchmaker-service
 
       - name: Analyze Matchmaker with SonarCloud
@@ -74,9 +74,10 @@ jobs:
         working-directory: services/matchmaker-service
 
       # Ranking Tests + Sonar
-      - name: Run Ranking Tests
+      - name: Run Ranking Tests and Coverage
         if: needs.detect-changes.outputs.ranking_changed == 'true'
-        run: ./gradlew test
+        run: |
+          ./gradlew clean test jacocoTestReport
         working-directory: services/ranking-service
 
       - name: Analyze Ranking with SonarCloud
