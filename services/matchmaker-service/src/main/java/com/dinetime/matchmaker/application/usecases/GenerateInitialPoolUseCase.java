@@ -1,9 +1,10 @@
 package com.dinetime.matchmaker.application.usecases;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import com.dinetime.matchmaker.ports.output.MatchRepository;
@@ -13,6 +14,8 @@ import com.dinetime.matchmaker.ports.output.MealRepository;
 public class GenerateInitialPoolUseCase {
     private final MealRepository mealSearchRepository;
     private final MatchRepository matchRepository;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public GenerateInitialPoolUseCase(MealRepository mealSearchRepository, MatchRepository matchRepository) {
         this.mealSearchRepository = mealSearchRepository;
@@ -29,10 +32,12 @@ public class GenerateInitialPoolUseCase {
     }
 
     private String generateUniqueGameCode() {
-        String code;
-        do {
-            code = RandomStringUtils.randomAlphanumeric(7).toUpperCase();
-        } while (matchRepository.exists(code));
-        return code;
+    String code;
+    do {
+        code = SECURE_RANDOM.ints(7, 0, CHARACTERS.length())
+                .mapToObj(i -> String.valueOf(CHARACTERS.charAt(i)))
+                .collect(Collectors.joining());
+    } while (matchRepository.exists(code));
+    return code;
     }
 }

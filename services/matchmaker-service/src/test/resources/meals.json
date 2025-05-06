@@ -1,0 +1,19 @@
+[
+    {
+      "id": "meal1",
+      "title": "Tomato Pasta",
+      "cuisine": "italian",
+      "ingredients": ["Tomato", "Pasta", "Basil"],
+      "instructions": "Boil pasta, add tomato.",
+      "imageUrl": "http://example.com/image1.jpg"
+    },
+    {
+      "id": "meal2",
+      "title": "Bacon Burger",
+      "cuisine": "American",
+      "ingredients": ["Bacon", "Beef", "Bun"],
+      "instructions": "Grill bacon, assemble burger.",
+      "imageUrl": "http://example.com/image2.jpg"
+    }
+  ]
+  

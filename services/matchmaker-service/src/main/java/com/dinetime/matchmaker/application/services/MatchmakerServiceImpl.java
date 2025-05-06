@@ -35,7 +35,7 @@ public class MatchmakerServiceImpl implements MatchmakerService {
     }
 
     @Override
-public MatchResponse getPool(String gameCode) {
+    public MatchResponse getPool(String gameCode) {
     Match match = getPoolUseCase.execute(gameCode);
 
     List<MealResponse> mealResponses = match.getMeals().stream()
