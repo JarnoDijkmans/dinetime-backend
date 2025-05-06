@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.dinetime.matchmaker.adapters.persistence.jpa.MatchJpaRepository;
 import com.dinetime.matchmaker.adapters.persistence.jpa.PoolJpaRepository;
@@ -30,6 +32,8 @@ import com.dinetime.matchmaker.ports.output.MealRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+@SpringBootTest
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 class MatchRepositoryImplTest {
 
