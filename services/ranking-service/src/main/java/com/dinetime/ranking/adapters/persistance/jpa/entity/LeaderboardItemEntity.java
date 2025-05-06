@@ -17,14 +17,10 @@ public class LeaderboardItemEntity {
     private String mealId;
     private int totalScore;
 
-    @ManyToOne
-    @JoinColumn(name = "leaderboard_id", nullable = false)
-    private LeaderboardEntity leaderboard;
 
-    public LeaderboardItemEntity(String mealId, int totalScore, LeaderboardEntity leaderboard) {
+    public LeaderboardItemEntity(String mealId, int totalScore ) {
         this.mealId = mealId;
         this.totalScore = totalScore;
-        this.leaderboard = leaderboard;
     }
 
     public void replaceScore(int newScore) {
@@ -33,11 +29,10 @@ public class LeaderboardItemEntity {
         }
     }
 
-    public static LeaderboardItemEntity fromDomain(LeaderboardItem item, LeaderboardEntity leaderboard) {
-        return new LeaderboardItemEntity(item.getMealId(), item.getTotalScore(), leaderboard);
+    public static LeaderboardItemEntity fromDomain(LeaderboardItem item ) {
+        return new LeaderboardItemEntity(item.getMealId(), item.getTotalScore());
     }
 
-    // ✅ Convert to Domain Model
     public LeaderboardItem toDomain() {
         return new LeaderboardItem(mealId, totalScore);
     }

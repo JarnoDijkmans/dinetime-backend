@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "leaderboards")
@@ -21,7 +19,8 @@ public class LeaderboardEntity {
 
     private String lobbyCode;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "leaderboard")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "leaderboard_id") 
     private List<LeaderboardItemEntity> items;
 
     public LeaderboardEntity(String lobbyCode, List<LeaderboardItemEntity> items) {
@@ -42,30 +41,27 @@ public class LeaderboardEntity {
             }
 
             if (!updated) {
-                this.items.add(new LeaderboardItemEntity(newItem.getMealId(), newItem.getTotalScore(), this));
+                this.items.add(new LeaderboardItemEntity(newItem.getMealId(), newItem.getTotalScore()));
             }
         }
     }
 
 
     public static LeaderboardEntity fromDomain(Leaderboard leaderboard) {
-        LeaderboardEntity entity = new LeaderboardEntity(leaderboard.getLobbyCode(), new ArrayList<>());
-
-        // ✅ Pass entity at creation
-
-        entity.items = leaderboard.getItems().stream()
-                .map(item -> new LeaderboardItemEntity(item.getMealId(), item.getTotalScore(), entity))
-                .collect(Collectors.toList()); // ✅ Assign all items in one step
-
-        return entity;
+        return new LeaderboardEntity(
+            leaderboard.getLobbyCode(),
+            leaderboard.getItems().stream()
+                .map(item -> new LeaderboardItemEntity(item.getMealId(), item.getTotalScore()))
+                .toList()
+        );
     }
 
-
     public Leaderboard toDomain() {
-        List<LeaderboardItem> domainItems = items.stream()
-                .map(LeaderboardItemEntity::toDomain)
-                .collect(Collectors.toList());
-
-        return new Leaderboard(lobbyCode, domainItems);
+        return new Leaderboard(
+            lobbyCode,
+            items.stream()
+                 .map(LeaderboardItemEntity::toDomain)
+                 .toList()
+        );
     }
 }
