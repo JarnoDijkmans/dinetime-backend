@@ -65,7 +65,7 @@ jobs:
       # Matchmaker Tests + Sonar
       - name: Run Matchmaker Tests
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
-        run: ./gradlew clean test jacocoTestReport
+        run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
         working-directory: services/matchmaker-service
 
       - name: Analyze Matchmaker with SonarCloud
