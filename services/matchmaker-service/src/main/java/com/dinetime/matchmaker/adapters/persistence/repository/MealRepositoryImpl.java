@@ -31,7 +31,6 @@ public class MealRepositoryImpl implements MealRepository {
 
     @Override
     public List<String> searchMeals(List<String> cuisines, List<String> requiredIngredients, List<String> excludedIngredients, int limit) {
-        System.err.println(cuisines);
 
         List<String> safeCuisine = Optional.ofNullable(cuisines).orElse(Collections.emptyList());
         List<String> safeRequired = Optional.ofNullable(requiredIngredients).orElse(Collections.emptyList());

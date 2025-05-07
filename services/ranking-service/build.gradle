@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+    id 'jacoco'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id "org.sonarqube" version "4.4.1.3373"
@@ -36,20 +37,38 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'com.h2database:h2'
 }
 
 
 tasks.named('test') {
 	useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
+
+jacocoTestReport {
+    dependsOn test 
+
+    reports {
+        xml.required = true 
+        html.required = true
+    }
+}
+
 
 sonarqube {
     properties {
+        property "sonar.gradle.skipCompile", "true"
         property "sonar.projectKey", "dinetime-sonar_ranking-service"
         property "sonar.organization", "dinetime-sonar"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.token", System.getenv("SONAR_TOKEN")
+
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 

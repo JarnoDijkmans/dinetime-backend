@@ -8,6 +8,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class Leaderboard {
-    private final long lobbyId;
+    private final String lobbyCode;
     private final List<LeaderboardItem> items;
 }
