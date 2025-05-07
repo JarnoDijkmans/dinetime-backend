@@ -41,11 +41,11 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
             .post("/leaderboards/batch", {
                 leaderboards: {
                     "100": [
-                        { mealId: 1, totalScore: 20.0 },
-                        { mealId: 2, totalScore: 40.0 }
+                        { mealId: "1", totalScore: 20.0 },
+                        { mealId: "2", totalScore: 40.0 }
                     ],
                     "200": [
-                        { mealId: 3, totalScore: 15.0 }
+                        { mealId: "3", totalScore: 15.0 }
                     ]
                 }
             })

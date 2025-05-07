@@ -20,7 +20,7 @@ export async function flushLeaderboardsToRankingService() {
             return;
         }
 
-        const leaderboards: Record<string, { mealId: number; totalScore: number }[]> = {};
+        const leaderboards: Record<string, { mealId: string; totalScore: number }[]> = {};
 
         for (const key of keys) {
             const lobbyCode = key.split(":")[1]; 
@@ -29,7 +29,7 @@ export async function flushLeaderboardsToRankingService() {
             const validMeals = Object.entries(meals)
                 .filter(([_, totalScore]) => totalScore.trim() !== "") 
                 .map(([mealId, totalScore]) => ({
-                    mealId: parseInt(mealId),
+                    mealId,
                     totalScore: parseFloat(totalScore),
                 }));
 
