@@ -4,14 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.test.context.ActiveProfiles;
+
 
 import org.junit.jupiter.api.Test;
 
 import com.dinetime.ranking.domain.model.Leaderboard;
 import com.dinetime.ranking.domain.model.LeaderboardItem;
 
+@ActiveProfiles("test")
 class LeaderboardEntityTest {
-
 @Test
 void fromDomain_shouldConvertLeaderboardToEntity() {
     // Arrange

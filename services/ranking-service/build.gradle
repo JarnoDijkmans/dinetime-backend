@@ -25,10 +25,6 @@ repositories {
 	mavenCentral()
 }
 
-test {
-    useJUnitPlatform()
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'redis.clients:jedis:5.1.0'
@@ -45,12 +41,13 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
     testImplementation 'org.mockito:mockito-junit-jupiter'
-
+    testImplementation 'com.h2database:h2'
 }
 
 
 tasks.named('test') {
 	useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
@@ -58,8 +55,7 @@ jacocoTestReport {
 
     reports {
         xml.required = true 
-        html.required = false
-        csv.required = false
+        html.required = true
     }
 }
 
