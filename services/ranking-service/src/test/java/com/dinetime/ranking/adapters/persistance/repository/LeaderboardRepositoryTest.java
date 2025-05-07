@@ -8,12 +8,14 @@ import com.dinetime.ranking.domain.model.LeaderboardItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 class LeaderboardRepositoryTest {
 
     @Mock

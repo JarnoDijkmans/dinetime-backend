@@ -1,11 +1,12 @@
 package com.dinetime.ranking.adapters.persistance.jpa.entity;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.dinetime.ranking.domain.model.LeaderboardItem;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@ActiveProfiles("test")
 class LeaderboardItemEntityTest {
 
     @Test
