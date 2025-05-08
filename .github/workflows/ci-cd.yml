@@ -51,6 +51,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node
+
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
@@ -121,7 +137,13 @@ jobs:
         run: |
           cd services/matchmaker-service && ./gradlew bootJar && cd ../..
           cd services/ranking-service && ./gradlew bootJar && cd ../..
-      
+
+      - name: Build Realtime Service (Node.js)
+        run: |
+          cd services/realtime-service
+          npm ci
+          npm run build || echo "No build script defined; skipping..."
+          cd ../..
       
       - name: Build All Services
         run: docker compose build
@@ -142,3 +164,13 @@ jobs:
         run: |
           docker tag dinetime-backend-realtime-service dockerjarnodijkmans/realtime-service:${{ github.sha }}
           docker push dockerjarnodijkmans/realtime-service:${{ github.sha }}
+
+      - name: Build Nginx Gateway Image
+        run: |
+          docker build -t dockerjarnodijkmans/nginx-gateway:${{ github.sha }} -f nginx.Dockerfile .
+
+      - name: Push Nginx Gateway Image
+        run: |
+          docker push dockerjarnodijkmans/nginx-gateway:${{ github.sha }}
+
+
