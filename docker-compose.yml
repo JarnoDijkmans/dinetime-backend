@@ -12,10 +12,12 @@ services:
     depends_on:
       ranking-mysql:
         condition: service_started
+    networks:
+      - dinetime-net
+
 
   ranking-mysql:
     image: mysql:8.0
-    container_name: ranking-service-mysql
     environment:
       - MYSQL_ROOT_PASSWORD=!Gaptunklas7
       - MYSQL_DATABASE=dinetime_ranking_db
@@ -23,6 +25,8 @@ services:
       - "3306:3306"
     volumes:
       - ranking-mysql-data:/var/lib/mysql
+    networks:
+       - dinetime-net
 
 
   realtime-service:
@@ -37,6 +41,9 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - redis
+    networks:
+      - dinetime-net
+
   
   matchmaker-service:
     build:
@@ -44,10 +51,11 @@ services:
       args:
         - JAR_FILE=build/libs/matchmaker-0.0.1-SNAPSHOT.jar
     container_name: matchmaker-service
+    networks:
+       - dinetime-net
 
   matchmaker-mysql:
     image: mysql:8.0
-    container_name: matchmaker-service-mysql
     environment:
       - MYSQL_ROOT_PASSWORD=!Gaptunklas7
       - MYSQL_DATABASE=dinetime_matchmaker_db
@@ -55,6 +63,8 @@ services:
       - "3307:3306"
     volumes:
       - matchmaker-mysql-data:/var/lib/mysql
+    networks:
+       - dinetime-net
 
 
   nginx-gateway:
@@ -69,7 +79,8 @@ services:
       - ranking-service
       - realtime-service
     networks:
-      - default
+      - dinetime-net
+
 
   redis:
     image: redis:latest
@@ -79,6 +90,8 @@ services:
     volumes:
       - redis-data:/data
     command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - dinetime-net
 
   redis-test:
     image: redis:latest
@@ -91,5 +104,10 @@ volumes:
   redis-data:
   ranking-mysql-data:
   matchmaker-mysql-data:  
+
+networks:
+  dinetime-net:
+    driver: bridge
+
 
 
