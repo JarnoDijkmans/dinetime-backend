@@ -35,46 +35,34 @@ export class RedisRepository implements LeaderboardPort {
     async canUserVote(lobbyCode: string): Promise<boolean> {
         const timeRemaining = await this.redis.ttl(`leaderboard:${lobbyCode}`);
         return timeRemaining > 7200;
-      }
+    }
       
 
     async voteMeal(userId: string, mealId: string, lobbyCode: string, newScore: number) {
         const leaderboardKey = `leaderboard:${lobbyCode}`;
         const pendingVotesKey = `pending_votes:${lobbyCode}`;
         const userVoteKey = `vote:${userId}:${mealId}:${lobbyCode}`;
-
-        const exists = await this.redis.exists(leaderboardKey);
-        if (!exists) {
+        const dirtyLobbiesKey = "dirty_lobbies";
+    
+        const leaderboardExists = await this.redis.exists(leaderboardKey);
+        if (!leaderboardExists) {
             console.log(`⚠️ Leaderboard ${leaderboardKey} does not exist. Creating it now...`);
             await this.redis.expire(leaderboardKey, 50400); 
         }
-
-        const existingVote = await this.getUserVote(userId, mealId, lobbyCode);
-
-        if (existingVote !== null) {
-            console.log('🔄 User previously voted:', existingVote);
-            await this.redis.zincrby(leaderboardKey, newScore - existingVote, mealId.toString());
-        } else {
-            console.log('🆕 First time voting.');
-            await this.redis.zincrby(leaderboardKey, newScore, mealId.toString());
-        }
-
+    
+        const existingVoteStr = await this.redis.get(userVoteKey);
+        const existingVote = existingVoteStr !== null ? parseFloat(existingVoteStr) : null;
+    
+        const delta = existingVote !== null ? newScore - existingVote : newScore;
+    
+        await this.redis.zincrby(leaderboardKey, delta, mealId.toString());
+        await this.redis.hincrbyfloat(pendingVotesKey, mealId.toString(), delta);
+    
         await this.redis.set(userVoteKey, newScore.toString());
-
-        const realTimeTotalScore = await this.redis.zscore(leaderboardKey, mealId.toString());
-
-        console.log("realTimeTotalScore:", realTimeTotalScore);
-
-        if (realTimeTotalScore !== null) {
-            const existingPendingTotal = await this.redis.hget(pendingVotesKey, mealId.toString());
-
-            const updatedPendingTotal = existingPendingTotal
-                ? parseFloat(existingPendingTotal) - (existingVote ?? 0) + newScore
-                : realTimeTotalScore;
-
-            await this.redis.hset(pendingVotesKey, mealId.toString(), updatedPendingTotal.toString());
-
-            console.log(`📢 Updated pending_votes_db: Meal ${mealId} in lobby ${lobbyCode} now has ${updatedPendingTotal}`);
-        }
+    
+        await this.redis.sadd(dirtyLobbiesKey, lobbyCode);
+    
+        console.log(`🔄 User ${userId} voted ${newScore} on ${mealId} (delta: ${delta})`);
     }
+    
 }
