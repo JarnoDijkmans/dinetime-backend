@@ -13,7 +13,7 @@ const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server, path: "/leaderboard-events" });
+const wss = new WebSocketServer({ server, path: "/" });
 
 const leaderboardRepository = new RedisRepository();
 const leaderboardService = new LeaderboardService(leaderboardRepository);

@@ -47,7 +47,7 @@ class LeaderboardControllerTest {
         when(leaderboardService.batchSaveLeaderboard(any()))
                 .thenReturn(mockResponse);
 
-        mockMvc.perform(post("/leaderboards/batch")
+        mockMvc.perform(post("/batch")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(requestModel)))
                 .andExpect(status().isOk())
