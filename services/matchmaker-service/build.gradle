@@ -40,7 +40,8 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
     testImplementation 'org.mockito:mockito-junit-jupiter'
-    testImplementation 'com.h2database:h2'
+    
+    runtimeOnly 'com.h2database:h2'
 }
 
 test {

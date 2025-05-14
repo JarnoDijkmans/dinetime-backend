@@ -31,7 +31,7 @@ public class PoolEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
     private MatchEntity matchEntity;
-    @Column(name = "pool_number", nullable = false, unique = true)
+    @Column(name = "pool_number", nullable = false)
     private int poolNumber;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

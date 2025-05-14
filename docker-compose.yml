@@ -7,17 +7,17 @@ services:
       args:
         - JAR_FILE=build/libs/ranking-service-0.0.1-SNAPSHOT.jar
     container_name: ranking-service
-    ports:
-      - "5001:5001"
     environment:
       - NODE_ENV=production
     depends_on:
       ranking-mysql:
         condition: service_started
+    networks:
+      - dinetime-net
+
 
   ranking-mysql:
     image: mysql:8.0
-    container_name: ranking-service-mysql
     environment:
       - MYSQL_ROOT_PASSWORD=!Gaptunklas7
       - MYSQL_DATABASE=dinetime_ranking_db
@@ -25,6 +25,8 @@ services:
       - "3306:3306"
     volumes:
       - ranking-mysql-data:/var/lib/mysql
+    networks:
+       - dinetime-net
 
 
   realtime-service:
@@ -32,8 +34,6 @@ services:
       context: ./services/realtime-service
       target: prod              
     container_name: realtime-service
-    ports:
-      - "5002:5000"
     environment:
       - NODE_ENV=production
       - PORT=5000
@@ -41,6 +41,9 @@ services:
       - REDIS_PORT=6379
     depends_on:
       - redis
+    networks:
+      - dinetime-net
+
   
   matchmaker-service:
     build:
@@ -48,12 +51,11 @@ services:
       args:
         - JAR_FILE=build/libs/matchmaker-0.0.1-SNAPSHOT.jar
     container_name: matchmaker-service
-    ports:
-      - "8080:8080" 
+    networks:
+       - dinetime-net
 
   matchmaker-mysql:
     image: mysql:8.0
-    container_name: matchmaker-service-mysql
     environment:
       - MYSQL_ROOT_PASSWORD=!Gaptunklas7
       - MYSQL_DATABASE=dinetime_matchmaker_db
@@ -61,6 +63,25 @@ services:
       - "3307:3306"
     volumes:
       - matchmaker-mysql-data:/var/lib/mysql
+    networks:
+       - dinetime-net
+
+
+  nginx-gateway:
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    container_name: nginx-gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - matchmaker-service
+      - ranking-service
+      - realtime-service
+    networks:
+      - dinetime-net
 
 
   redis:
@@ -71,6 +92,8 @@ services:
     volumes:
       - redis-data:/data
     command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - dinetime-net
 
   redis-test:
     image: redis:latest
@@ -83,5 +106,10 @@ volumes:
   redis-data:
   ranking-mysql-data:
   matchmaker-mysql-data:  
+
+networks:
+  dinetime-net:
+    driver: bridge
+
 
 

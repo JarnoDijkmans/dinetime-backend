@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/leaderboards")
+@RequestMapping("/")
 public class LeaderboardController {
      private final ILeaderboardService leaderboardService;
 

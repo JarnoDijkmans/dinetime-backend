@@ -2,7 +2,7 @@ spring:
   application:
     name: matchmaker
   datasource:
-    url: jdbc:mysql://localhost:3307/dinetime_matchmaker_db
+    url: jdbc:mysql://matchmaker-mysql:3306/dinetime_matchmaker_db
     username: root
     password: "!Gaptunklas7"
 
