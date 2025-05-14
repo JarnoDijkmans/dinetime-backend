@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ranking-service
+  labels:
+    app: ranking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ranking-service
+  template:
+    metadata:
+      labels:
+        app: ranking-service
+    spec:
+      containers:
+        - name: ranking-service
+          image: docker.io/dockerjarnodijkmans/ranking-service:824c280de3844e0014e72fa715f61836fdbdf1ff
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
