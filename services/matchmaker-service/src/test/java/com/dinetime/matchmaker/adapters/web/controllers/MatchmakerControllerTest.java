@@ -44,7 +44,7 @@ class MatchmakerControllerTest {
 
         when(matchmakerService.generateInitialPool(any())).thenReturn(response);
 
-        mockMvc.perform(post("/matchmaking/generate-initial-pool")
+        mockMvc.perform(post("/generate-initial-pool")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ class MatchmakerControllerTest {
 
         when(matchmakerService.generateInitialPool(any())).thenThrow(new RuntimeException("Simulated error"));
 
-        mockMvc.perform(post("/matchmaking/generate-initial-pool")
+        mockMvc.perform(post("/generate-initial-pool")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -72,7 +72,7 @@ class MatchmakerControllerTest {
 
         when(matchmakerService.getPool("GAME123")).thenReturn(response);
 
-        mockMvc.perform(get("/matchmaking/get-pool/GAME123"))
+        mockMvc.perform(get("/get-pool/GAME123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.gameCode").value("GAME123"))
                 .andExpect(jsonPath("$.meals[0].title").value("Pizza"));
@@ -82,7 +82,7 @@ class MatchmakerControllerTest {
     void getCurrentPool_shouldReturn400OnError() throws Exception {
         when(matchmakerService.getPool("INVALID")).thenThrow(new RuntimeException("Not found"));
 
-        mockMvc.perform(get("/matchmaking/get-pool/INVALID"))
+        mockMvc.perform(get("/get-pool/INVALID"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Not found"));
     }

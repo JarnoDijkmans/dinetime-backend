@@ -152,25 +152,19 @@ jobs:
         run: |
           docker tag dinetime-backend-matchmaker-service dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
           docker push dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
+          docker push dockerjarnodijkmans/matchmaker-service:latest
 
 
       - name: Push Ranking Image
         run: |
           docker tag dinetime-backend-ranking-service dockerjarnodijkmans/ranking-service:${{ github.sha }}
           docker push dockerjarnodijkmans/ranking-service:${{ github.sha }}
+          docker push dockerjarnodijkmans/ranking-service:latest
 
 
       - name: Push Realtime Image
         run: |
           docker tag dinetime-backend-realtime-service dockerjarnodijkmans/realtime-service:${{ github.sha }}
           docker push dockerjarnodijkmans/realtime-service:${{ github.sha }}
-
-      - name: Build Nginx Gateway Image
-        run: |
-          docker build -t dockerjarnodijkmans/nginx-gateway:${{ github.sha }} -f nginx.Dockerfile .
-
-      - name: Push Nginx Gateway Image
-        run: |
-          docker push dockerjarnodijkmans/nginx-gateway:${{ github.sha }}
-
+          docker push dockerjarnodijkmans/realtime-service:latest
 

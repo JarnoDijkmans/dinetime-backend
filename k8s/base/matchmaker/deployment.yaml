@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matchmaker-service
+  labels:
+    app: matchmaker-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matchmaker-service
+  template:
+    metadata:
+      labels:
+        app: matchmaker-service
+    spec:
+      containers:
+        - name: matchmaker-service
+          image: docker.io/dockerjarnodijkmans/matchmaker-service:824c280de3844e0014e72fa715f61836fdbdf1ff
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://matchmaker-mysql:3306/dinetime_matchmaker_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "!Gaptunklas7"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
