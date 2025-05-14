@@ -151,6 +151,8 @@ jobs:
       - name: Push Matchmaker Image
         run: |
           docker tag dinetime-backend-matchmaker-service dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
+          docker tag dinetime-backend-matchmaker-service dockerjarnodijkmans/matchmaker-service:latest
+
           docker push dockerjarnodijkmans/matchmaker-service:${{ github.sha }}
           docker push dockerjarnodijkmans/matchmaker-service:latest
 
@@ -158,6 +160,8 @@ jobs:
       - name: Push Ranking Image
         run: |
           docker tag dinetime-backend-ranking-service dockerjarnodijkmans/ranking-service:${{ github.sha }}
+          docker tag dinetime-backend-ranking-service dockerjarnodijkmans/ranking-service:latest
+
           docker push dockerjarnodijkmans/ranking-service:${{ github.sha }}
           docker push dockerjarnodijkmans/ranking-service:latest
 
@@ -165,6 +169,8 @@ jobs:
       - name: Push Realtime Image
         run: |
           docker tag dinetime-backend-realtime-service dockerjarnodijkmans/realtime-service:${{ github.sha }}
+          docker tag dinetime-backend-realtime-service dockerjarnodijkmans/realtime-service:latest
+          
           docker push dockerjarnodijkmans/realtime-service:${{ github.sha }}
           docker push dockerjarnodijkmans/realtime-service:latest
 
