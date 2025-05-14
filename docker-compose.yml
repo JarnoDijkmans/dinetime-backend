@@ -68,7 +68,9 @@ services:
 
 
   nginx-gateway:
-    image: dockerjarnodijkmans/nginx-gateway:latest
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
     container_name: nginx-gateway
     ports:
       - "80:80"
