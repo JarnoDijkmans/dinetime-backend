@@ -14,7 +14,7 @@ import com.dinetime.matchmaker.adapters.web.response.MatchResponse;
 import com.dinetime.matchmaker.ports.input.MatchmakerService;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/matchmaker")
 public class MatchmakerController {
 
     private final MatchmakerService matchmakerService;
