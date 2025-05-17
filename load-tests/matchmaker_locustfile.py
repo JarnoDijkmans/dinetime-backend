@@ -26,7 +26,7 @@ class MatchmakerUser(HttpUser):
         }
 
         print("▶️ Sending payload:", json.dumps(payload))
-        response = self.client.post("/matchmaker/matchmaking/generate-initial-pool", json=payload)
+        response = self.client.post("/matchmaker/generate-initial-pool", json=payload)
 
         print("🔄 Status:", response)
 
@@ -39,4 +39,4 @@ class MatchmakerUser(HttpUser):
     @task(1)
     def get_current_pool(self):
         if self.game_code:
-            self.client.get(f"/matchmaker/matchmaking/get-pool/{self.game_code}")
+            self.client.get(f"/matchmaker/get-pool/{self.game_code}")

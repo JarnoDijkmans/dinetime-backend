@@ -1,7 +1,8 @@
 export type WebSocketMessage =
     | { type: "join_lobby"; lobbyCode: string }
     | { type: "fetch_leaderboard"; lobbyCode: string }
-    | { type: "vote_meal"; userId: string; mealId: string; score: number };
+    | { type: "vote_meal"; userId: string; mealId: string; score: number }
+    | { type: "disconnect"; };
 
 
     export interface Vote {

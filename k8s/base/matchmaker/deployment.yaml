@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: matchmaker-service
-          image: docker.io/dockerjarnodijkmans/matchmaker-service:824c280de3844e0014e72fa715f61836fdbdf1ff
+          image: docker.io/dockerjarnodijkmans/matchmaker-service:latest
           ports:
             - containerPort: 8080
           env:

@@ -4,28 +4,34 @@ metadata:
   name: dinetime-ingress
   annotations:
     nginx.ingress.kubernetes.io/websocket-services: "realtime-service"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/keep-alive: "120"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/limit-connections: "1000"
 spec:
   rules:
     - host: dinetime.local
       http:
         paths:
-          - path: /matchmaker(/|$)(.*)
+          - path: /matchmaker
             pathType: Prefix
             backend:
               service:
                 name: matchmaker-service
                 port:
                   number: 80
-          - path: /ranking/
-            pathType: Prefix
+          - path: /ranking/(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: ranking-service
                 port:
                   number: 80
-          - path: /realtime/
+          - path: /realtime
             pathType: Prefix
             backend:
               service:

@@ -13,10 +13,9 @@ export class LobbyConnection implements Connection {
       this.socket.send(JSON.stringify({ type, payload }));
     }
   
-    get lobbyCode(): string {
+    get lobbyCode(): string | null {
       if (this._lobbyCode === null) {
-        this.socket.send(JSON.stringify({ type: "error", message: "No active lobby. Please reconnect." }));
-        throw new Error("No active lobby. Please reconnect.");
+        return null;
       }
       return this._lobbyCode;
     }

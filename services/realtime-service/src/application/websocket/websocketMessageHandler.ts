@@ -59,4 +59,8 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
 
         await this.leaderboardService.voteMeal(data.userId ,data.mealId, conn.lobbyCode, data.score);
     }
+
+    public handleDisconnect(conn: LobbyConnection): void {
+      this.lobbyManager.removeConnection(conn);
+    }
 }

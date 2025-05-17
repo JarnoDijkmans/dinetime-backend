@@ -5,7 +5,7 @@ metadata:
   labels:
     app: realtime-service
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: realtime-service
@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
         - name: realtime-service
-          image: docker.io/dockerjarnodijkmans/realtime-service:824c280de3844e0014e72fa715f61836fdbdf1ff
+          image: docker.io/dockerjarnodijkmans/realtime-service:latest
           ports:
-            - containerPort: 3000
+            - containerPort: 5000
           env:
             - name: REDIS_HOST
               value: redis
@@ -26,3 +26,11 @@ spec:
               value: "6379"
             - name: NODE_ENV
               value: "production"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+

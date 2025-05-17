@@ -5,6 +5,9 @@ export class LobbyManager{
 
     addConnection(conn: LobbyConnection) {
         const lobbyCode = conn.lobbyCode;
+        if (!lobbyCode) {
+            return;
+        }
         if (!this.lobbies.has(lobbyCode)) {
             this.lobbies.set(lobbyCode, new Set());
         }
@@ -13,6 +16,9 @@ export class LobbyManager{
 
     removeConnection(conn: LobbyConnection) {
         const lobbyCode = conn.lobbyCode;
+        if (!lobbyCode) {
+            return;
+        }
         const lobby = this.lobbies.get(lobbyCode);
         if (lobby) {
             lobby.delete(conn);
