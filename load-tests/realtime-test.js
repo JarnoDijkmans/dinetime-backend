@@ -6,10 +6,9 @@ import { uuidv4 } from "https://jslib.k6.io/k6-utils/1.4.0/index.js";
 export let options = {
   vus: 1000,
   stages: [
-    { duration: "30s", target: 5000 },
-    { duration: "30s", target: 10000 },
-    { duration: "1m", target: 20000 },
-    { duration: "1m", target: 30000 },
+    { duration: "30s", target: 300 },
+    { duration: "30s", target: 1000 },
+    { duration: "1m", target: 1000 },
   ]
 };
 
@@ -24,7 +23,7 @@ export default function () {
     // 👇 Each user gets a unique lobby by using the VU number
     const lobbyCode = `LOBBY-${(__VU % 5).toString().padStart(5, "0")}`;
   
-    const url = "ws://localhost/realtime/leaderboard-events";
+    const url = "ws://localhost/realtime/";
   
     const res = ws.connect(url, {}, function (socket) {
       console.log(`🔌 ${userId} connected`);

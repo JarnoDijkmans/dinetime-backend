@@ -1,0 +1,15 @@
+config:
+  target: "ws://localhost/realtime/"
+  phases:
+    - duration: 120         # Ramp up over 2 minutes (120s)
+      arrivalRate: 200      # 200 new users/sec for 120s = 24,000 users
+      name: "Slower ramp-up"
+  ws: {}
+scenarios:
+  - engine: "ws"
+    flow:
+      - loop:
+          - send: '{"action":"ping"}'
+          - think: 10
+        count: 6
+      - think: 10

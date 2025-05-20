@@ -12,12 +12,15 @@ export class WebSocketGateway {
         this.wss = wss;
         this.messageHandler = messageHandler;
         this.setupWebSocket();
+        setInterval(() => {
+        console.log(`[WS] Clients now: ${this.wss.clients.size}`);
+        }, 5000);
     }
     
 
     private setupWebSocket() {
         this.wss.on("connection", (ws) => {
-            console.log(`[WS] New client connected! Clients now: ${this.wss.clients.size}`);
+            // console.log(`[WS] New client connected! Clients now: ${this.wss.clients.size}`);
             // const conn: Connection = new LobbyConnection(ws);
     
             (ws as any).isAlive = true;
@@ -31,7 +34,7 @@ export class WebSocketGateway {
             // });
     
             ws.on("close", (code, reason) => {
-                console.log(`[WS] Client disconnected! Code: ${code}, Reason: ${reason}, Clients now: ${this.wss.clients.size - 1}`);
+                console.log(`[WS] Client disconnected! Code: ${code}, Reason: ${reason}, Clients now: ${this.wss.clients.size}`);
             });
             
             ws.on("error", (err) => {
@@ -39,16 +42,15 @@ export class WebSocketGateway {
             });
         });
     
-        const interval = setInterval(() => {
-            this.wss.clients.forEach((client) => {
-                if ((client as any).isAlive === false) return client.terminate();
-    
-                (client as any).isAlive = false;
-                client.ping();
+            setInterval(() => {
+            this.wss.clients.forEach((ws) => {
+                if (!(ws as any).isAlive) return ws.terminate();
+                (ws as any).isAlive = false;
+                ws.ping();
             });
         }, 30000);
     
-        this.wss.on("close", () => clearInterval(interval));
+
     }
 
     private async handleWebSocketMessage(conn: Connection, message: string) {
