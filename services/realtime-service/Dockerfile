@@ -19,5 +19,5 @@ COPY --from=base /app/dist ./dist
 COPY --from=base /app/package*.json ./
 RUN npm ci --production
 ENV NODE_ENV=production
-EXPOSE 5000
+EXPOSE 80
 CMD ["node", "dist/app.js"]
