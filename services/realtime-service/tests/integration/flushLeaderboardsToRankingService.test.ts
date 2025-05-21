@@ -33,10 +33,11 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
         await redis.hset("pending_votes:100", "1", "20");
         await redis.hset("pending_votes:100", "2", "40");
         await redis.hset("pending_votes:200", "3", "15");
-
-        const keysBefore = await redis.keys("pending_votes:*");
-        console.log("🔍 Keys in Mocked Redis before flush:", keysBefore);
-
+    
+        // 🔧 Add dirty lobbies
+        await redis.sadd("dirty_lobbies", "100");
+        await redis.sadd("dirty_lobbies", "200");
+    
         const scope = nock("http://localhost:5001")
             .post("/leaderboards/batch", {
                 leaderboards: {
@@ -50,19 +51,19 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
                 }
             })
             .reply(200, { success: true });
-
-        console.log("🛠️ Nock Mock Set Up!");
-
+    
         await flushLeaderboardsToRankingService();
-
-        console.log("🔍 Nock pending mocks after flush:", nock.pendingMocks());
-
+    
         expect(scope.isDone()).toBe(true);
-
+    
         const keysAfter = await redis.keys("pending_votes:*");
-        console.log("🗑️ Keys in Mocked Redis after flush:", keysAfter);
         expect(keysAfter.length).toBe(0);
+    
+        const dirtyLobbies = await redis.smembers("dirty_lobbies");
+        expect(dirtyLobbies).not.toContain("100");
+        expect(dirtyLobbies).not.toContain("200");
     });
+    
 
     test("✅ Should do nothing if no leaderboards exist", async () => {
         const scope = nock("http://localhost:5001")
@@ -91,18 +92,20 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
 
     test("✅ Should not delete Redis data if ranking service fails", async () => {
         await redis.hset("pending_votes:300", "4", "50");
-
+        await redis.sadd("dirty_lobbies", "300"); 
+    
         const scope = nock("http://localhost:5001")
             .post("/leaderboards/batch")
             .reply(500, { success: false });
-
+    
         await flushLeaderboardsToRankingService();
-
+    
         expect(scope.isDone()).toBe(true); 
-
+    
         const keysAfter = await redis.keys("pending_votes:*");
         expect(keysAfter).toContain("pending_votes:300"); 
     });
+    
 
     test("✅ Should handle an empty payload properly", async () => {
         await redis.hset("pending_votes:400", "invalid", "");
@@ -113,6 +116,6 @@ describe("flushLeaderboardsToRankingService Integration Test (Mocked Redis)", ()
 
         await flushLeaderboardsToRankingService();
 
-        expect(scope.isDone()).toBe(false); // 🚀 No HTTP call should be made
+        expect(scope.isDone()).toBe(false); 
     });
 });
