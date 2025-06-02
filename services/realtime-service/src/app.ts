@@ -1,6 +1,6 @@
 import "dotenv/config";
 import http from "http";
-import express from "express";
+import express, { Request, Response } from "express";
 import "./infrastructure/flushVotesToDatabase";
 import { WebSocketGateway } from "./presentation/websocket/websocketGateway";
 import { LeaderboardService } from "./application/services/leaderboardService";
@@ -9,10 +9,10 @@ import { LobbyManager } from "./application/websocket/lobbyManager";
 import { WebsocketMessageHandler } from "./application/websocket/websocketMessageHandler";
 import { WebSocketServer } from "ws";
 
-console.log("🟢 [DineTime] App starting...");
-
 const app = express();
-const PORT = Number(process.env.PORT) || 80;
+app.get("/", (req: Request, res: Response) => res.status(200).send("OK"));
+app.get("/realtime", (req: Request, res: Response) => res.status(200).send("OK"));
+const PORT = Number(process.env.PORT) || 5000;
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/realtime" });
