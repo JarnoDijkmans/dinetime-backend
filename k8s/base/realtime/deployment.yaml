@@ -16,13 +16,13 @@ spec:
     spec:
       containers:
         - name: realtime-service
-          image: docker.io/dockerjarnodijkmans/realtime-service:824c280de3844e0014e72fa715f61836fdbdf1ff
+          image: dinetimeacr.azurecr.io/dinetime-backend-realtime-service:latest
           ports:
-            - containerPort: 3000
+            - containerPort: 80
           env:
+            - name: PORT
+              value: "80"
             - name: REDIS_HOST
-              value: redis
+              value: "redis"
             - name: REDIS_PORT
               value: "6379"
-            - name: NODE_ENV
-              value: "production"

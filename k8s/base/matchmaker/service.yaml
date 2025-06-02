@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: matchmaker-service
 spec:
-  selector:
-    app: matchmaker-service
+  type: ClusterIP
   ports:
     - port: 80
-      targetPort: 8080
-  type: ClusterIP
+      targetPort: 8080 
+  selector:
+    app: matchmaker-service

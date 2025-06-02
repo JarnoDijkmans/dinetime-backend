@@ -2,33 +2,29 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dinetime-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/websocket-services: "realtime-service"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: azure-application-gateway
   rules:
-    - host: dinetime.local
-      http:
+    - http:
         paths:
-          - path: /matchmaker(/|$)(.*)
+          - path: /realtime
             pathType: Prefix
             backend:
               service:
-                name: matchmaker-service
+                name: realtime-service
                 port:
                   number: 80
-          - path: /ranking/
+          - path: /ranking
             pathType: Prefix
             backend:
               service:
                 name: ranking-service
                 port:
                   number: 80
-          - path: /realtime/
+          - path: /matchmaker
             pathType: Prefix
             backend:
               service:
-                name: realtime-service
+                name: matchmaker-service
                 port:
                   number: 80
