@@ -15,20 +15,39 @@ export class WebSocketGateway {
     }
 
     private setupWebSocket() {
-        this.wss.on("connection", async (ws) => {
-            const conn: Connection = new LobbyConnection(ws);
+    setInterval(() => {
+        this.wss.clients.forEach((ws: any) => {
+            if (ws.isAlive === false) {
+                console.log("Terminating dead socket");
+                return ws.terminate();
+            }
+            ws.isAlive = false;
+            ws.ping(); 
+        });
+    }, 10000);
 
-            ws.on("message", async (message: string) => {
-                await this.handleWebSocketMessage(conn, message);
-            });
+    this.wss.on("connection", (ws: any) => {
+        ws.isAlive = true; 
 
-            ws.on("close", () => console.log("Leaderboard WebSocket Disconnected"));
+        ws.on('pong', () => {
+            console.log("Received pong from client");
+            ws.isAlive = true;
         });
 
-        this.wss.on("error", (error) => {
-            console.error("WebSocket Server Error:", error);
+        const conn: Connection = new LobbyConnection(ws);
+
+        ws.on("message", async (message: string) => {
+            await this.handleWebSocketMessage(conn, message);
         });
-    }
+
+        ws.on("close", () => console.log("Leaderboard WebSocket Disconnected"));
+    });
+
+    this.wss.on("error", (error) => {
+        console.error("WebSocket Server Error:", error);
+    });
+}
+
 
     private async handleWebSocketMessage(conn: Connection, message: string) {
         try {

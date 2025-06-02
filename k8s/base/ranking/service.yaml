@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: ranking-service
 spec:
-  selector:
-    app: ranking-service
+  type: ClusterIP
   ports:
     - port: 80
-      targetPort: 8080
-  type: ClusterIP
+      targetPort: 80
+  selector:
+    app: ranking-service
