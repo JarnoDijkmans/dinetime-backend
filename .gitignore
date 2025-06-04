@@ -67,3 +67,5 @@ base.css
 report-task.txt
 
 *.log
+
+.env
