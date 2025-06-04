@@ -1,9 +1,7 @@
 plugins {
 	id 'java'
-	id 'jacoco'
-	id 'org.springframework.boot' version '3.4.4'
+	id 'org.springframework.boot' version '3.4.6'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id "org.sonarqube" version "4.4.1.3373"
 }
 
 group = 'com.dinetime'
@@ -16,9 +14,9 @@ java {
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
@@ -28,11 +26,16 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.apache.commons:commons-lang3:3.12.0'\
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT TOKEN
+    implementation 'com.auth0:java-jwt:4.4.0'
 
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
@@ -43,30 +46,6 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
 }
 
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
+tasks.named('test') {
+	useJUnitPlatform()
 }
-
-
-jacocoTestReport {
-    dependsOn test 
-
-    reports {
-        xml.required = true 
-        html.required = true
-    }
-}
-
-sonarqube {
-    properties {
-		property "sonar.gradle.skipCompile", "true"
-        property "sonar.projectKey", "dinetime-sonar_matchmaker-service"
-        property "sonar.organization", "dinetime-sonar"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.token", System.getenv("SONAR_TOKEN")
-
-		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-    }
-}
-
