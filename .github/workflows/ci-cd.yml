@@ -169,21 +169,21 @@ jobs:
 
       - name: Upload Dependency-Check Report (Matchmaker)
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report-matchmaker
           path: services/matchmaker-service/build/reports/dependency-check
 
       - name: Upload Dependency-Check Report (Ranking)
         if: needs.detect-changes.outputs.ranking_changed == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report-ranking
           path: services/ranking-service/build/reports/dependency-check
 
       - name: Upload npm Audit Report (Realtime)
         if: needs.detect-changes.outputs.realtime_changed == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: npm-audit-report-realtime
           path: services/realtime-service/audit-report.json
