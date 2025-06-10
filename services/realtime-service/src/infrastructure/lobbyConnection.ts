@@ -1,8 +1,10 @@
+import { JwtClaims } from "../shared/types/jwtClaims";
 import { Connection } from "../ports/out/connection";
 import WebSocket from "ws";
 
 export class LobbyConnection implements Connection {
     private readonly socket: WebSocket;
+    public jwtClaims: JwtClaims | null = null;
     private _lobbyCode: string | null = null;
   
     constructor(socket: WebSocket) {

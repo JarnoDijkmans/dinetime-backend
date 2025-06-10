@@ -1,0 +1,2 @@
+security:
+  jwt-secret: ${SECURITY_JWT-SECRET:default-unsafe-value}

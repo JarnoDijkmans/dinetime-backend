@@ -26,22 +26,16 @@ export class RedisRepository implements LeaderboardPort {
         return formattedData;
     }
 
-    async getUserVote(userId: string, mealId: string, lobbyCode: string): Promise<number | null> {
-        const key = `vote:${userId}:${mealId}:${lobbyCode}`;
-        const score = await this.redis.get(key);
-        return score ? parseFloat(score) : null;
-    }
-
     async canUserVote(lobbyCode: string): Promise<boolean> {
         const timeRemaining = await this.redis.ttl(`leaderboard:${lobbyCode}`);
         return timeRemaining > 7200;
     }
       
 
-    async voteMeal(userId: string, mealId: string, lobbyCode: string, newScore: number) {
+    async voteMeal(deviceId: string, mealId: string, lobbyCode: string, newScore: number) {
         const leaderboardKey = `leaderboard:${lobbyCode}`;
         const pendingVotesKey = `pending_votes:${lobbyCode}`;
-        const userVoteKey = `vote:${userId}:${mealId}:${lobbyCode}`;
+        const userVoteKey = `vote:${deviceId}:${mealId}:${lobbyCode}`;
         const dirtyLobbiesKey = "dirty_lobbies";
     
         const leaderboardExists = await this.redis.exists(leaderboardKey);
@@ -62,7 +56,7 @@ export class RedisRepository implements LeaderboardPort {
     
         await this.redis.sadd(dirtyLobbiesKey, lobbyCode);
     
-        console.log(`🔄 User ${userId} voted ${newScore} on ${mealId} (delta: ${delta})`);
+        console.log(`🔄 User ${deviceId} voted ${newScore} on ${mealId} (delta: ${delta})`);
     }
     
 }

@@ -51,12 +51,12 @@ export class WebsocketMessageHandler implements WebSocketMessageHandlerPort {
     
     public async handleVoteMeal(conn: LobbyConnection, data: WebSocketMessage) {
         if (!conn.lobbyCode) {
-            conn.send("error", {message: "You must join a lobby before voting!" });
-        return;
+          conn.send("error", {message: "You must join a lobby before voting!" });
+          return;
         }
 
         if (data.type !== "vote_meal") return;
 
-        await this.leaderboardService.voteMeal(data.userId ,data.mealId, conn.lobbyCode, data.score);
+        await this.leaderboardService.voteMeal(data.deviceId ,data.mealId, conn.lobbyCode, data.score);
     }
 }
