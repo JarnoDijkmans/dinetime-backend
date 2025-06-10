@@ -40,8 +40,6 @@ jobs:
               - 'ci-cd.yml'
               - '*.md'
 
-
-
   run-tests-and-analysis:
     needs: detect-changes
     runs-on: ubuntu-latest
@@ -78,7 +76,15 @@ jobs:
         with:
           node-version: '18'
 
-      # Matchmaker Tests + Sonar
+      - name: Cache Dependency-Check Data
+        id: cache-owasp-dc
+        uses: actions/cache@v3
+        with:
+          path: services/dependency-check-data
+          key: owasp-dc-data-${{ runner.os }}
+
+
+      # Matchmaker Tests + Sonar + Dependency Check
       - name: Run Matchmaker Tests
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
         run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
@@ -89,7 +95,25 @@ jobs:
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: services/matchmaker-service
 
-      # Ranking Tests + Sonar
+      - name: Dependency Check (Matchmaker)
+        if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+        run: |
+          mkdir -p services/matchmaker-service/build/reports/dependency-check
+          mkdir -p services/dependency-check-data
+          docker run --rm \
+            -v "${{ github.workspace }}/services/dependency-check-data:/usr/share/dependency-check/data" \
+            -v "${{ github.workspace }}/services/matchmaker-service:/src" \
+            -v "${{ github.workspace }}/services/matchmaker-service/build/reports/dependency-check:/report" \
+            owasp/dependency-check:latest \
+            --project "matchmaker-service" \
+            --scan /src \
+            --format HTML \
+            --out /report \
+            --failOnCVSS 7 \
+            --nvdApiKey "${{ secrets.NVD_API_KEY }}"
+
+
+      # Ranking Tests + Sonar + Dependency Check
       - name: Run Ranking Tests and Coverage
         if: needs.detect-changes.outputs.ranking_changed == 'true'
         run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
@@ -100,7 +124,24 @@ jobs:
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: services/ranking-service
 
-      # Realtime Tests + Sonar
+      - name: Dependency Check (ranking)
+        if: needs.detect-changes.outputs.ranking_changed == 'true'
+        run: |
+          mkdir -p services/ranking-service/build/reports/dependency-check
+          mkdir -p services/dependency-check-data
+          docker run --rm \
+            -v "${{ github.workspace }}/services/dependency-check-data:/usr/share/dependency-check/data" \
+            -v "${{ github.workspace }}/services/ranking-service:/src" \
+            -v "${{ github.workspace }}/services/ranking-service/build/reports/dependency-check:/report" \
+            owasp/dependency-check:latest \
+            --project "ranking-service" \
+            --scan /src \
+            --format HTML \
+            --out /report \
+            --failOnCVSS 7 \
+            --nvdApiKey "${{ secrets.NVD_API_KEY }}"
+
+      # Realtime Tests + Sonar + Dependency Check
       - name: Run Realtime Tests
         if: needs.detect-changes.outputs.realtime_changed == 'true'
         run: |
@@ -118,6 +159,34 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Security Audit (Realtime)
+        if: needs.detect-changes.outputs.realtime_changed == 'true'
+        run: |
+          npm ci
+          npm audit --audit-level=moderate --production
+        working-directory: services/realtime-service
+
+      - name: Upload Dependency-Check Report (Matchmaker)
+        if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report-matchmaker
+          path: services/matchmaker-service/build/reports/dependency-check
+
+      - name: Upload Dependency-Check Report (Ranking)
+        if: needs.detect-changes.outputs.ranking_changed == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report-ranking
+          path: services/ranking-service/build/reports/dependency-check
+
+      - name: Upload npm Audit Report (Realtime)
+        if: needs.detect-changes.outputs.realtime_changed == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: npm-audit-report-realtime
+          path: services/realtime-service/audit-report.json
 
 
   build-and-deploy:
