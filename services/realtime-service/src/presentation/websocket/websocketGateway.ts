@@ -3,6 +3,8 @@ import { WebSocketMessage } from "../../shared/types";
 import { WebSocketMessageHandlerPort } from "../../ports/in/webSocketMessageHandlerPort";
 import { Connection } from "../../ports/out/connection";
 import { LobbyConnection } from "../../infrastructure/lobbyConnection";
+import jwt from "jsonwebtoken";
+import { JwtClaims } from "../../shared/types/jwtClaims";
 
 export class WebSocketGateway {
     private readonly wss: WebSocketServer;
@@ -26,22 +28,53 @@ export class WebSocketGateway {
         });
     }, 10000);
 
-    this.wss.on("connection", (ws: any) => {
-        ws.isAlive = true; 
+    this.wss.on("connection", (ws: any, req: any) => {
+    ws.isAlive = true;
 
-        ws.on('pong', () => {
-            console.log("Received pong from client");
-            ws.isAlive = true;
-        });
+    console.log("New WebSocket connection attempt:", req.url);
 
-        const conn: Connection = new LobbyConnection(ws);
+    const url = new URL(req.url, `wss://${req.headers.host}`);
+    const token = url.searchParams.get("token");
+    console.log("Extracted token from query:", token ? token.slice(0, 12) + "..." : "(none)");
 
-        ws.on("message", async (message: string) => {
-            await this.handleWebSocketMessage(conn, message);
-        });
+    if (!token) {
+        console.warn("Connection closed: No token provided");
+        ws.close(4001, "No token provided");
+        return;
+    }
 
-        ws.on("close", () => console.log("Leaderboard WebSocket Disconnected"));
+    let conn: Connection; 
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtClaims;
+
+        ws.jwt = decoded;
+        console.log("JWT verified. Claims:", decoded);
+
+        conn = new LobbyConnection(ws);
+        (conn as LobbyConnection).jwtClaims = decoded;
+
+        if (decoded.role === "guest") {
+            console.log(`Guest device ${decoded.device} connected.`);
+        } else if (decoded.role === "user") {
+            console.log(`User ${decoded.userId ?? "unknown"} connected.`);
+        }
+    } catch (err) {
+        console.error("JWT verification failed:", err instanceof Error ? err.message : err);
+        ws.close(4002, "Invalid or expired token");
+        return;
+    }
+
+
+    ws.on('pong', () => { ws.isAlive = true; });
+
+    ws.on("message", async (message: string) => {
+        await this.handleWebSocketMessage(conn, message);
     });
+
+    ws.on("close", () => console.log("Leaderboard WebSocket Disconnected"));
+    });
+
 
     this.wss.on("error", (error) => {
         console.error("WebSocket Server Error:", error);
