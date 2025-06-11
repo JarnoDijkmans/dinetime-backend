@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: matchmaker-service
-          image: dinetimeacr.azurecr.io/dinetime-backend-matchmaker-service:latest
+          image: dinetimeacr.azurecr.io/matchmaker-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

@@ -17,6 +17,7 @@ spec:
       containers:
         - name: realtime-service
           image: dinetimeacr.azurecr.io/realtime-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
