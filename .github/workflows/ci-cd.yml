@@ -93,6 +93,7 @@ jobs:
           mkdir -p services/matchmaker-service/build/reports/dependency-check
           mkdir -p services/dependency-check-data
           docker run --rm \
+            --platform linux/amd64 \
             -v "${{ github.workspace }}/services/dependency-check-data:/usr/share/dependency-check/data" \
             -v "${{ github.workspace }}/services/matchmaker-service:/src" \
             -v "${{ github.workspace }}/services/matchmaker-service/build/reports/dependency-check:/report" \
@@ -122,6 +123,7 @@ jobs:
           mkdir -p services/ranking-service/build/reports/dependency-check
           mkdir -p services/dependency-check-data
           docker run --rm \
+            --platform linux/amd64 \
             -v "${{ github.workspace }}/services/dependency-check-data:/usr/share/dependency-check/data" \
             -v "${{ github.workspace }}/services/ranking-service:/src" \
             -v "${{ github.workspace }}/services/ranking-service/build/reports/dependency-check:/report" \
