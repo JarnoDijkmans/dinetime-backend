@@ -8,6 +8,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.Date;
 
 @Service
@@ -17,7 +18,8 @@ public class JwtTokenService {
     private final JWTVerifier verifier;
 
     public JwtTokenService(@Value("${security.jwt-secret}") String jwtSecret) {
-        this.algorithm = Algorithm.HMAC256(jwtSecret);
+        byte[] keyBytes = Base64.getDecoder().decode(jwtSecret);
+        this.algorithm = Algorithm.HMAC256(keyBytes);
         this.verifier = JWT.require(this.algorithm).withIssuer("dinetimelobby").build();
     }
 

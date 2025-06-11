@@ -82,7 +82,7 @@ jobs:
             resource-group: ${{ secrets.AZURE_RG }}
             cluster-name: ${{ secrets.AZURE_AKS_CLUSTER }}
 
-      - name: Create/Update JWT_SECRET
+      - name: Sync JWT Secret to k8s
         run: |
           kubectl create secret generic jwt-secret \
             --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
