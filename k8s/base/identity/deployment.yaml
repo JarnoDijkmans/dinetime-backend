@@ -23,8 +23,8 @@ spec:
         env:
           - name: JWT_SECRET
             valueFrom:
-              secretKeyRef:
-                name: identity-env
-                key: JWT_SECRET
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_SECRET
           - name: LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY
             value: DEBUG
