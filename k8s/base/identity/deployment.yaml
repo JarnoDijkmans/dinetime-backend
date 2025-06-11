@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: identity-service
-          image: dinetimeacr.azurecr.io/dinetime-backend-identity-service:latest
+          image: dinetimeacr.azurecr.io/identity-service:latest
           ports:
             - containerPort: 80

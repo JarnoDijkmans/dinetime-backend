@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: ranking-service
-          image: dinetimeacr.azurecr.io/dinetime-backend-ranking-service:latest
+          image: dinetimeacr.azurecr.io/ranking-service:latest
           ports:
             - containerPort: 80
           env:

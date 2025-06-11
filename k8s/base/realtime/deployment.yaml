@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: realtime-service
-          image: dinetimeacr.azurecr.io/dinetime-backend-realtime-service:latest
+          image: dinetimeacr.azurecr.io/realtime-service:latest
           ports:
             - containerPort: 80
           env:
