@@ -17,6 +17,7 @@ spec:
       containers:
         - name: ranking-service
           image: dinetimeacr.azurecr.io/ranking-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
