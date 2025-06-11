@@ -13,7 +13,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/token/**").permitAll()
+                .requestMatchers("/identity/api/token/**").permitAll()
+                .requestMatchers("/", "/identity").permitAll()
                 .anyRequest().denyAll()
             )
             .httpBasic(Customizer.withDefaults())
