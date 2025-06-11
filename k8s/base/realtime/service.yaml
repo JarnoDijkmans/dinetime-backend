@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: realtime-service
 spec:
-  selector:
-    app: realtime-service
+  type: ClusterIP
   ports:
     - port: 80
-      targetPort: 3000
-  type: ClusterIP
+      targetPort: 80
+  selector:
+    app: realtime-service
