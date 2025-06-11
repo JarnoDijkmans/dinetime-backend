@@ -105,7 +105,7 @@ jobs:
           run: |
             npm ci
             npm test
-            working-directory: services/realtime-service
+          working-directory: services/realtime-service
 
         - name: Analyze Realtime with SonarCloud
           uses: SonarSource/sonarcloud-github-action@v2.2
