@@ -13,27 +13,28 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfig {
 
     @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ✅ critical!
-        )
-        .requestCache(requestCache -> requestCache
-            .requestCache(new NullRequestCache()) // ✅ ADD THIS LINE
-        )
-        .authorizeHttpRequests(authz -> authz
-            .requestMatchers("/", "/identity", "/healthz", "/identity/api/token/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .exceptionHandling(ex -> ex
-            .authenticationEntryPoint((request, response, authException) ->
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("✅ Configuring security: /healthz should be public");
+        http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-        )
-        .httpBasic(httpBasic -> httpBasic.disable())
-        .formLogin(form -> form.disable());
+            .requestCache(requestCache -> requestCache
+                .requestCache(new NullRequestCache())
+            )
+            .authorizeHttpRequests(authz -> authz
+            .requestMatchers("/identity/healthz", "/identity/api/token/**").permitAll()
+            .anyRequest().authenticated()
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) ->
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                )
+            )
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .formLogin(form -> form.disable());
 
-    return http.build();
-}
+        return http.build();
+    }
 }

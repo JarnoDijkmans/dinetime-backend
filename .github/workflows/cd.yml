@@ -93,4 +93,4 @@ jobs:
         run: kubectl apply -R -f k8s/base/
 
       - name: Deploy ingress
-        run: kubectl apply -f k8s/ingress/dinetime-ingress.yaml
+        run: kubectl apply -R -f k8s/ingress/

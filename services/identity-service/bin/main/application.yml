@@ -1,2 +1,8 @@
 security:
   jwt-secret: ${SECURITY_JWT-SECRET:default-unsafe-value}
+
+spring:
+  security:
+    user:
+      name: none
+      password: none

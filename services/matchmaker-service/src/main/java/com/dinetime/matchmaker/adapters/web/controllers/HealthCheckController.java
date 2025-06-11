@@ -16,8 +16,8 @@ public class HealthCheckController {
         return ResponseEntity.ok("OK");
     }
 
-    @GetMapping("/healthz")
-    public ResponseEntity<String> healthCheck() {
+    @GetMapping("/matchmaker/healthz")
+    public ResponseEntity<String> healthCheckMatchMaker() {
         return ResponseEntity.ok("OK");
     }
 }
