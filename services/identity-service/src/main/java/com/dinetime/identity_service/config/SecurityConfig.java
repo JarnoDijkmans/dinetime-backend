@@ -14,7 +14,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/identity/api/token/**").permitAll()
-                .requestMatchers("/", "/identity").permitAll()
+                .requestMatchers("/", "/identity", "/healthz").permitAll()
                 .anyRequest().denyAll()
             )
             .httpBasic(Customizer.withDefaults())

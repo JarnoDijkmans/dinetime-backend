@@ -2,6 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: dinetime-ingress
+  annotations:
+    appgw.ingress.kubernetes.io/health-probe-path: /healthz
 spec:
   ingressClassName: azure-application-gateway
   rules:
