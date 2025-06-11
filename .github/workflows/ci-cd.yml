@@ -76,14 +76,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Cache Dependency-Check Data
-        id: cache-owasp-dc
-        uses: actions/cache@v3
-        with:
-          path: services/dependency-check-data
-          key: owasp-dc-data-${{ runner.os }}
-
-
       # Matchmaker Tests + Sonar + Dependency Check
       - name: Run Matchmaker Tests
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
