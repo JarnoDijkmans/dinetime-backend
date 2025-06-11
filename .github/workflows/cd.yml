@@ -82,6 +82,13 @@ jobs:
             resource-group: ${{ secrets.AZURE_RG }}
             cluster-name: ${{ secrets.AZURE_AKS_CLUSTER }}
 
+      - name: Create/Update JWT_SECRET
+        run: |
+          kubectl create secret generic identity-env \
+            --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --namespace=default \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Deploy base resources (services, deployments, db, etc.)
         run: kubectl apply -R -f k8s/base/
 

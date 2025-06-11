@@ -18,4 +18,10 @@ spec:
         - name: identity-service
           image: dinetimeacr.azurecr.io/identity-service:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
+          env:
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: identity-env
+                key: JWT_SECRET
