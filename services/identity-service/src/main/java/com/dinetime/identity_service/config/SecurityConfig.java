@@ -1,25 +1,39 @@
 package com.dinetime.identity_service.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.web.savedrequest.NullRequestCache;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
-@org.springframework.context.annotation.Configuration
+import jakarta.servlet.http.HttpServletResponse;
+
+@Configuration
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable()) 
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/identity/api/token/**").permitAll()
-                .requestMatchers("/", "/identity", "/healthz").permitAll()
-                .anyRequest().denyAll()
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ✅ critical!
+        )
+        .requestCache(requestCache -> requestCache
+            .requestCache(new NullRequestCache()) // ✅ ADD THIS LINE
+        )
+        .authorizeHttpRequests(authz -> authz
+            .requestMatchers("/", "/identity", "/healthz", "/identity/api/token/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint((request, response, authException) ->
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
             )
-            .httpBasic(Customizer.withDefaults())
-            .formLogin(form -> form.disable()); 
+        )
+        .httpBasic(httpBasic -> httpBasic.disable())
+        .formLogin(form -> form.disable());
 
-        return http.build();
-    }
+    return http.build();
+}
 }
