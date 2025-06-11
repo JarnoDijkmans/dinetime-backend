@@ -76,6 +76,14 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Cache Dependency-Check Data
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check
+          key: owasp-dc-data-${{ runner.os }}
+
+
+
       # Matchmaker Tests + Sonar + Dependency Check
       - name: Run Matchmaker Tests
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
@@ -87,21 +95,19 @@ jobs:
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: services/matchmaker-service
 
-      - name: Dependency Check (Matchmaker)
+      - name: Install OWASP Dependency-Check
+        run: |
+          wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip
+          unzip dependency-check-9.0.9-release.zip -d dependency-check
+      
+      - name: Dependency-Check (Matchmaker)
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
         run: |
-          mkdir -p services/matchmaker-service/build/reports/dependency-check
-          mkdir -p services/dependency-check-data
-          docker run --rm \
-            --platform linux/amd64 \
-            -v "${{ github.workspace }}/services/dependency-check-data:/usr/share/dependency-check/data" \
-            -v "${{ github.workspace }}/services/matchmaker-service:/src" \
-            -v "${{ github.workspace }}/services/matchmaker-service/build/reports/dependency-check:/report" \
-            owasp/dependency-check:latest \
+          ./dependency-check/bin/dependency-check.sh \
             --project "matchmaker-service" \
-            --scan /src \
+            --scan services/matchmaker-service \
             --format HTML \
-            --out /report \
+            --out services/matchmaker-service/build/reports/dependency-check \
             --failOnCVSS 7 \
             --nvdApiKey "${{ secrets.NVD_API_KEY }}"
 
@@ -117,21 +123,14 @@ jobs:
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: services/ranking-service
 
-      - name: Dependency Check (ranking)
+      - name: Dependency-Check (Ranking)
         if: needs.detect-changes.outputs.ranking_changed == 'true'
         run: |
-          mkdir -p services/ranking-service/build/reports/dependency-check
-          mkdir -p services/dependency-check-data
-          docker run --rm \
-            --platform linux/amd64 \
-            -v "${{ github.workspace }}/services/dependency-check-data:/usr/share/dependency-check/data" \
-            -v "${{ github.workspace }}/services/ranking-service:/src" \
-            -v "${{ github.workspace }}/services/ranking-service/build/reports/dependency-check:/report" \
-            owasp/dependency-check:latest \
+          ./dependency-check/bin/dependency-check.sh \
             --project "ranking-service" \
-            --scan /src \
+            --scan services/ranking-service \
             --format HTML \
-            --out /report \
+            --out services/ranking-service/build/reports/dependency-check \
             --failOnCVSS 7 \
             --nvdApiKey "${{ secrets.NVD_API_KEY }}"
 
