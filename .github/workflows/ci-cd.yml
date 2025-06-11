@@ -98,8 +98,8 @@ jobs:
       - name: Install OWASP Dependency-Check
         run: |
           wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip
-          unzip dependency-check-9.0.9-release.zip -d dependency-check
-      
+          unzip dependency-check-9.0.9-release.zip
+
       - name: Dependency-Check (Matchmaker)
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
         run: |
