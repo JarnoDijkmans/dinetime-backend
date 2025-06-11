@@ -102,6 +102,8 @@ jobs:
 
       - name: Dependency-Check (Matchmaker)
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           ./dependency-check/bin/dependency-check.sh \
             --project "matchmaker-service" \
@@ -109,7 +111,7 @@ jobs:
             --format HTML \
             --out services/matchmaker-service/build/reports/dependency-check \
             --failOnCVSS 7 \
-            --nvdApiKey "${{ secrets.NVD_API_KEY }}"
+            --nvdApiKey "$NVD_API_KEY"
 
 
       # Ranking Tests + Sonar + Dependency Check
@@ -125,6 +127,8 @@ jobs:
 
       - name: Dependency-Check (Ranking)
         if: needs.detect-changes.outputs.ranking_changed == 'true'
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           ./dependency-check/bin/dependency-check.sh \
             --project "ranking-service" \
@@ -132,7 +136,7 @@ jobs:
             --format HTML \
             --out services/ranking-service/build/reports/dependency-check \
             --failOnCVSS 7 \
-            --nvdApiKey "${{ secrets.NVD_API_KEY }}"
+            --nvdApiKey "$NVD_API_KEY"
 
       # Realtime Tests + Sonar + Dependency Check
       - name: Run Realtime Tests
