@@ -8,7 +8,7 @@ import com.dinetime.identity_service.adapters.web.response.GuestTokenResponse;
 import com.dinetime.identity_service.application.services.JwtTokenService;
 
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/identity/api/token")
 public class GuestTokenController {
 
     private final JwtTokenService jwtTokenService;
