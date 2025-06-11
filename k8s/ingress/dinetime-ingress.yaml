@@ -28,3 +28,10 @@ spec:
                 name: matchmaker-service
                 port:
                   number: 80
+          - path: /identity
+            pathType: Prefix
+            backend:
+              service:
+                name: identity-service
+                port:
+                  number: 80
