@@ -20,6 +20,9 @@ jobs:
         uses: azure/docker-login@v1
         with:
             login-server: dinetimeacr.azurecr.io
+            username: ${{ secrets.ACR_USERNAME }}
+            password: ${{ secrets.ACR_PASSWORD }}
+
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
