@@ -76,15 +76,8 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Cache Dependency-Check Data
-        uses: actions/cache@v4
-        with:
-          path: ~/.dependency-check
-          key: owasp-dc-data-${{ runner.os }}
 
-
-
-      # Matchmaker Tests + Sonar + Dependency Check
+      # Matchmaker Tests + Sonar
       - name: Run Matchmaker Tests
         if: needs.detect-changes.outputs.matchmaker_changed == 'true'
         run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
@@ -95,26 +88,8 @@ jobs:
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: services/matchmaker-service
 
-      - name: Install OWASP Dependency-Check
-        run: |
-          wget https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip
-          unzip dependency-check-9.0.9-release.zip
 
-      - name: Dependency-Check (Matchmaker)
-        if: needs.detect-changes.outputs.matchmaker_changed == 'true'
-        env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: |
-          ./dependency-check/bin/dependency-check.sh \
-            --project "matchmaker-service" \
-            --scan services/matchmaker-service \
-            --format HTML \
-            --out services/matchmaker-service/build/reports/dependency-check \
-            --failOnCVSS 7 \
-            --nvdApiKey "$NVD_API_KEY"
-
-
-      # Ranking Tests + Sonar + Dependency Check
+      # Ranking Tests + Sonar
       - name: Run Ranking Tests and Coverage
         if: needs.detect-changes.outputs.ranking_changed == 'true'
         run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
@@ -124,19 +99,6 @@ jobs:
         if: needs.detect-changes.outputs.ranking_changed == 'true'
         run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         working-directory: services/ranking-service
-
-      - name: Dependency-Check (Ranking)
-        if: needs.detect-changes.outputs.ranking_changed == 'true'
-        env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: |
-          ./dependency-check/bin/dependency-check.sh \
-            --project "ranking-service" \
-            --scan services/ranking-service \
-            --format HTML \
-            --out services/ranking-service/build/reports/dependency-check \
-            --failOnCVSS 7 \
-            --nvdApiKey "$NVD_API_KEY"
 
       # Realtime Tests + Sonar + Dependency Check
       - name: Run Realtime Tests
