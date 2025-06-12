@@ -28,3 +28,31 @@ jobs:
         with:
           name: npm-audit-report-realtime
           path: services/realtime-service/audit-report.json
+
+  docker-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Lint Matchmaker Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/matchmaker-service/Dockerfile
+      
+      - name: Lint Realtime Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/realtime-service/Dockerfile
+
+      - name: Lint Ranking Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/ranking-service/Dockerfile
+
+      - name: Lint Identity Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/identity-service/Dockerfile
+
+
+
