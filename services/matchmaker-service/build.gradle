@@ -74,5 +74,8 @@ sonarqube {
 dependencyCheck {
     failBuildOnCVSS = 7
     formats = ['HTML', 'JSON']
+	nvd {
+        apiKey = System.getenv('DEPENDENCY_CHECK_NVD_API_KEY')
+    }
 }
 
