@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: realtime-service
-          image: dinetimeacr.azurecr.io/dinetime-backend-realtime-service:latest
+          image: dinetimeacr.azurecr.io/realtime-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
@@ -26,3 +27,8 @@ spec:
               value: "redis"
             - name: REDIS_PORT
               value: "6379"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_SECRET
