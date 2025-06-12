@@ -1,4 +1,7 @@
 security:
+<<<<<<< HEAD
+  jwt-secret: ${SECURITY_JWT-SECRET:default-unsafe-value}
+=======
   jwt-secret: ${JWT_SECRET}
 
 spring:
@@ -6,3 +9,4 @@ spring:
     user:
       name: none
       password: none
+>>>>>>> develop
