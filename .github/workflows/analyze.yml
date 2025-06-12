@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dep-check-matchmaker
-          path: services/matchmaker-service/build/reports/dependency-check-report.html
+          path: services/matchmaker-service/build/reports/dependency-check-report.json
 
       - name: Run OWASP Dependency Check - Ranking
         run: ./gradlew dependencyCheckAnalyze
@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dep-check-ranking
-          path: services/ranking-service/build/reports/dependency-check-report.html
+          path: services/ranking-service/build/reports/dependency-check-report.json
 
       - name: Run OWASP Dependency Check - Identity
         run: ./gradlew dependencyCheckAnalyze
@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dep-check-identity
-          path: services/identity-service/build/reports/dependency-check-report.html
+          path: services/identity-service/build/reports/dependency-check-report.json
 
   secrets-scan:
     runs-on: ubuntu-latest
@@ -76,15 +76,33 @@ jobs:
       - uses: actions/checkout@v3
       - name: Scan for secrets with Gitleaks
         uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --source=. --report-format=json --report-path=gitleaks-report.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker-security:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run Dockerfile Linter (Hadolint)
+      - name: Lint Matchmaker Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: services/matchmaker-service/Dockerfile
+      
+      - name: Lint Realtime Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/realtime-service/Dockerfile
+
+      - name: Lint Ranking Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/ranking-service/Dockerfile
+
+      - name: Lint identity Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: services/identity-service/Dockerfile
+
+
+
