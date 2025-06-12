@@ -47,10 +47,10 @@ jobs:
 
       - name: Run OWASP Dependency Check - Matchmaker
         working-directory: services/matchmaker-service
-        run: ./gradlew dependencyCheckAnalyze
+        run: ./gradlew dependencyCheckAnalyze --info
         env:
           DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
       - name: Upload Dependency Check Report - Matchmaker
         uses: actions/upload-artifact@v4
