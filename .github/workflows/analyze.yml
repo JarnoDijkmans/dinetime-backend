@@ -41,8 +41,11 @@ jobs:
           java-version: '17'
 
       - name: Run OWASP Dependency Check - Matchmaker
-        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: services/matchmaker-service
+        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=$NVD_API_KEY
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+
 
       - name: Upload Dependency Check Report - Matchmaker
         uses: actions/upload-artifact@v4
@@ -53,6 +56,8 @@ jobs:
       - name: Run OWASP Dependency Check - Ranking
         run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: services/ranking-service
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
       - name: Upload Dependency Check Report - Ranking
         uses: actions/upload-artifact@v4
@@ -63,6 +68,8 @@ jobs:
       - name: Run OWASP Dependency Check - Identity
         run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: services/identity-service
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
       - name: Upload Dependency Check Report - Identity
         uses: actions/upload-artifact@v4
