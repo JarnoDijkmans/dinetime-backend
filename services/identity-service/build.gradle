@@ -32,9 +32,9 @@ dependencies {
     // JWT TOKEN
     implementation 'com.auth0:java-jwt:4.4.0'
 
-	compileOnly 'org.projectlombok:lombok:1.18.30'
+	compileOnly 'org.projectlombok:lombok:1.18.38'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.38'
 
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
