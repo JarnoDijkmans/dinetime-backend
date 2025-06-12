@@ -46,8 +46,7 @@ export class WebSocketGateway {
     let conn: Connection; 
 
     try {
-        const rawSecret = process.env.JWT_SECRET!;
-        const key = Buffer.from(rawSecret, 'base64');
+        const key = process.env.JWT_SECRET!;
         const decoded = jwt.verify(token, key, { algorithms: ['HS256'] }) as JwtClaims;
 
 
