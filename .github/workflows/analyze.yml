@@ -28,3 +28,63 @@ jobs:
         with:
           name: npm-audit-report-realtime
           path: services/realtime-service/audit-report.json
+
+  security-java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run OWASP Dependency Check - Matchmaker
+        run: ./gradlew dependencyCheckAnalyze
+        working-directory: services/matchmaker-service
+
+      - name: Upload Dependency Check Report - Matchmaker
+        uses: actions/upload-artifact@v4
+        with:
+          name: dep-check-matchmaker
+          path: services/matchmaker-service/build/reports/dependency-check-report.html
+
+      - name: Run OWASP Dependency Check - Ranking
+        run: ./gradlew dependencyCheckAnalyze
+        working-directory: services/ranking-service
+
+      - name: Upload Dependency Check Report - Ranking
+        uses: actions/upload-artifact@v4
+        with:
+          name: dep-check-ranking
+          path: services/ranking-service/build/reports/dependency-check-report.html
+
+      - name: Run OWASP Dependency Check - Identity
+        run: ./gradlew dependencyCheckAnalyze
+        working-directory: services/identity-service
+
+      - name: Upload Dependency Check Report - Identity
+        uses: actions/upload-artifact@v4
+        with:
+          name: dep-check-identity
+          path: services/identity-service/build/reports/dependency-check-report.html
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Scan for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source=. --report-format=json --report-path=gitleaks-report.json
+
+  docker-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run Dockerfile Linter (Hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
