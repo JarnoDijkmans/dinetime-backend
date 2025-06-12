@@ -46,7 +46,14 @@ export class WebSocketGateway {
     let conn: Connection; 
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtClaims;
+        const rawSecret = process.env.JWT_SECRET!;
+        const key = Buffer.from(rawSecret, 'base64');
+        const decoded = jwt.verify(token, key, { algorithms: ['HS256'] }) as JwtClaims;
+
+
+        console.log("Raw URL:", req.url);
+        console.log("Full header host:", req.headers.host);
+
 
         ws.jwt = decoded;
         console.log("JWT verified. Claims:", decoded);
