@@ -44,7 +44,7 @@ jobs:
         working-directory: services/matchmaker-service
         run: ./gradlew dependencyCheckAnalyze
         env:
-           DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
 
       - name: Upload Dependency Check Report - Matchmaker
@@ -54,10 +54,10 @@ jobs:
           path: services/matchmaker-service/build/reports/dependency-check-report.json
 
       - name: Run OWASP Dependency Check - Ranking
-        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAnalyze
         working-directory: services/ranking-service
         env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
       - name: Upload Dependency Check Report - Ranking
         uses: actions/upload-artifact@v4
@@ -66,10 +66,10 @@ jobs:
           path: services/ranking-service/build/reports/dependency-check-report.json
 
       - name: Run OWASP Dependency Check - Identity
-        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
+        run: ./gradlew dependencyCheckAnalyze
         working-directory: services/identity-service
         env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
       - name: Upload Dependency Check Report - Identity
         uses: actions/upload-artifact@v4
