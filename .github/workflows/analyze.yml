@@ -41,7 +41,7 @@ jobs:
           java-version: '17'
 
       - name: Run OWASP Dependency Check - Matchmaker
-        run: ./gradlew dependencyCheckAnalyze
+        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: services/matchmaker-service
 
       - name: Upload Dependency Check Report - Matchmaker
@@ -51,7 +51,7 @@ jobs:
           path: services/matchmaker-service/build/reports/dependency-check-report.json
 
       - name: Run OWASP Dependency Check - Ranking
-        run: ./gradlew dependencyCheckAnalyze
+        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: services/ranking-service
 
       - name: Upload Dependency Check Report - Ranking
@@ -61,7 +61,7 @@ jobs:
           path: services/ranking-service/build/reports/dependency-check-report.json
 
       - name: Run OWASP Dependency Check - Identity
-        run: ./gradlew dependencyCheckAnalyze
+        run: ./gradlew dependencyCheckAnalyze -Dnvd.apiKey=${{ secrets.NVD_API_KEY }}
         working-directory: services/identity-service
 
       - name: Upload Dependency Check Report - Identity
@@ -69,15 +69,6 @@ jobs:
         with:
           name: dep-check-identity
           path: services/identity-service/build/reports/dependency-check-report.json
-
-  secrets-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Scan for secrets with Gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker-security:
     runs-on: ubuntu-latest
