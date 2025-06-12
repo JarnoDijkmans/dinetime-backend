@@ -40,6 +40,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Check key length (debug)
+        run: 'echo "NVD API Key length: ${#DEPENDENCY_CHECK_NVD_API_KEY}"'
+        env:
+          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+
       - name: Run OWASP Dependency Check - Matchmaker
         working-directory: services/matchmaker-service
         run: ./gradlew dependencyCheckAnalyze
