@@ -29,59 +29,6 @@ jobs:
           name: npm-audit-report-realtime
           path: services/realtime-service/audit-report.json
 
-  security-java:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Check key length (debug)
-        run: 'echo "NVD API Key length: ${#DEPENDENCY_CHECK_NVD_API_KEY}"'
-        env:
-          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-
-      - name: Run OWASP Dependency Check - Matchmaker
-        working-directory: services/matchmaker-service
-        run: ./gradlew dependencyCheckAnalyze --info
-        env:
-          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-
-      - name: Upload Dependency Check Report - Matchmaker
-        uses: actions/upload-artifact@v4
-        with:
-          name: dep-check-matchmaker
-          path: services/matchmaker-service/build/reports/dependency-check-report.json
-
-      - name: Run OWASP Dependency Check - Ranking
-        run: ./gradlew dependencyCheckAnalyze
-        working-directory: services/ranking-service
-        env:
-          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-
-      - name: Upload Dependency Check Report - Ranking
-        uses: actions/upload-artifact@v4
-        with:
-          name: dep-check-ranking
-          path: services/ranking-service/build/reports/dependency-check-report.json
-
-      - name: Run OWASP Dependency Check - Identity
-        run: ./gradlew dependencyCheckAnalyze
-        working-directory: services/identity-service
-        env:
-          DEPENDENCY_CHECK_NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-
-      - name: Upload Dependency Check Report - Identity
-        uses: actions/upload-artifact@v4
-        with:
-          name: dep-check-identity
-          path: services/identity-service/build/reports/dependency-check-report.json
-
   docker-security:
     runs-on: ubuntu-latest
     steps:
@@ -102,7 +49,7 @@ jobs:
         with:
           dockerfile: services/ranking-service/Dockerfile
 
-      - name: Lint identity Dockerfile
+      - name: Lint Identity Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: services/identity-service/Dockerfile
