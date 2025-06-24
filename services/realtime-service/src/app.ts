@@ -7,6 +7,7 @@ import { LeaderboardService } from "./application/services/leaderboardService";
 import { RedisRepository } from "./infrastructure/repository/redisRepository";
 import { LobbyManager } from "./application/websocket/lobbyManager";
 import { WebsocketMessageHandler } from "./application/websocket/websocketMessageHandler";
+import { createLeaderboardSubscriber } from "./infrastructure/messaging/leaderboardSubscriber";
 import { WebSocketServer } from "ws";
 
 const app = express();
@@ -25,6 +26,7 @@ const leaderboardRepository = new RedisRepository();
 const leaderboardService = new LeaderboardService(leaderboardRepository);
 const lobbyManager = new LobbyManager();
 const messageHandler = new WebsocketMessageHandler(leaderboardService, wss, lobbyManager);
+createLeaderboardSubscriber(wss);
 
 
 const gateway = new WebSocketGateway(wss, messageHandler);

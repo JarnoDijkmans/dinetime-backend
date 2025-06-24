@@ -11,4 +11,5 @@ import com.dinetime.matchmaker.adapters.persistence.jpa.entity.PoolMealEntity;
 @Repository
 public interface PoolMealJpaRepository extends JpaRepository<PoolMealEntity, Long> {
     List<PoolMealEntity> findByPool(PoolEntity poolEntity);
+    void deleteByPool(PoolEntity poolEntity);
 }

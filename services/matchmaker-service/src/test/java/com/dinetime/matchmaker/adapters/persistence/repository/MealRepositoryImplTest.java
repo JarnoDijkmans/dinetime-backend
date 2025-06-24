@@ -4,32 +4,21 @@ import com.dinetime.matchmaker.domain.model.Meal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
 class MealRepositoryImplTest {
 
     private MealRepositoryImpl mealRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() throws IOException {
-        try (InputStream inputStream = getClass().getResourceAsStream("/meals.json")) {
-            assertNotNull(inputStream, "Test resource 'meals.json' is missing");
-        }
-
-        mealRepository = new MealRepositoryImpl(objectMapper); 
+        ObjectMapper objectMapper = new ObjectMapper();
+        mealRepository = new MealRepositoryImpl(objectMapper);
     }
 
 

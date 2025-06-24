@@ -54,6 +54,9 @@ services:
     container_name: matchmaker-service
     networks:
        - dinetime-net
+    environment:
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
 
   matchmaker-mysql:
     image: mysql:8.0

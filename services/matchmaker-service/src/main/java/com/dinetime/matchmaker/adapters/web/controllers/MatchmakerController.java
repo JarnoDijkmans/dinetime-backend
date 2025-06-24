@@ -1,6 +1,7 @@
 package com.dinetime.matchmaker.adapters.web.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,16 @@ public class MatchmakerController {
         try {
             MatchResponse response = matchmakerService.getPool(gameCode);
             return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete-pool/{gameCode}")
+    public ResponseEntity<Object> deletePool(@PathVariable String gameCode) {
+        try {
+            matchmakerService.deletePool(gameCode);
+            return ResponseEntity.ok("Pool deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

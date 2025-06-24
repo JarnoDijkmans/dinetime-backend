@@ -9,6 +9,7 @@ import com.dinetime.matchmaker.adapters.web.request.InitialPoolRequest;
 import com.dinetime.matchmaker.adapters.web.response.CreatedMatchResponse;
 import com.dinetime.matchmaker.adapters.web.response.MatchResponse;
 import com.dinetime.matchmaker.adapters.web.response.MealResponse;
+import com.dinetime.matchmaker.application.usecases.DeletePoolUseCase;
 import com.dinetime.matchmaker.application.usecases.GenerateInitialPoolUseCase;
 import com.dinetime.matchmaker.application.usecases.GetPoolUseCase;
 import com.dinetime.matchmaker.domain.model.Match;
@@ -18,10 +19,12 @@ import com.dinetime.matchmaker.ports.input.MatchmakerService;
 public class MatchmakerServiceImpl implements MatchmakerService {
     private final GetPoolUseCase getPoolUseCase;
     private final GenerateInitialPoolUseCase generateInitialPoolUseCase;
+    private final DeletePoolUseCase deletePoolUseCase;
 
-    public MatchmakerServiceImpl(GenerateInitialPoolUseCase generateInitialPoolUseCase, GetPoolUseCase getPoolUseCase) {
+    public MatchmakerServiceImpl(GenerateInitialPoolUseCase generateInitialPoolUseCase, GetPoolUseCase getPoolUseCase, DeletePoolUseCase deletePoolUseCase) {
         this.generateInitialPoolUseCase = generateInitialPoolUseCase;
         this.getPoolUseCase = getPoolUseCase;
+        this.deletePoolUseCase = deletePoolUseCase;
     }
 
     @Override
@@ -51,5 +54,10 @@ public class MatchmakerServiceImpl implements MatchmakerService {
 
     return new MatchResponse(match.getGameCode(), match.getPoolNumber(), mealResponses);
 }
+
+    @Override
+    public void deletePool(String gameCode) {
+        deletePoolUseCase.execute(gameCode);
+    }
 
 }
