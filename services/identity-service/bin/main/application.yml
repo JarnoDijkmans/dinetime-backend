@@ -1,0 +1,8 @@
+security:
+  jwt-secret: ${JWT_SECRET}
+
+spring:
+  security:
+    user:
+      name: none
+      password: none
