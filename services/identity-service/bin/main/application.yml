@@ -1,8 +1,16 @@
 security:
-  jwt-secret: ${JWT_SECRET}
+  jwt-secret: ${SECURITY_JWT-SECRET}
 
 spring:
-  security:
-    user:
-      name: none
-      password: none
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    from: ${MAIL_USERNAME}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

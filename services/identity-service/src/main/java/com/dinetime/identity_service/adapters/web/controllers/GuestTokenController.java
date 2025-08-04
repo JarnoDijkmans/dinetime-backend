@@ -5,15 +5,15 @@ import org.springframework.web.bind.annotation.*;
 
 import com.dinetime.identity_service.adapters.web.request.GuestTokenRequest;
 import com.dinetime.identity_service.adapters.web.response.GuestTokenResponse;
-import com.dinetime.identity_service.application.services.JwtTokenService;
+import com.dinetime.identity_service.application.services.JwtTokenServiceImpl;
 
 @RestController
 @RequestMapping("/api/token")
 public class GuestTokenController {
 
-    private final JwtTokenService jwtTokenService;
+    private final JwtTokenServiceImpl jwtTokenService;
 
-    public GuestTokenController(JwtTokenService jwtTokenService) {
+    public GuestTokenController(JwtTokenServiceImpl jwtTokenService) {
         this.jwtTokenService = jwtTokenService;
     }
 
