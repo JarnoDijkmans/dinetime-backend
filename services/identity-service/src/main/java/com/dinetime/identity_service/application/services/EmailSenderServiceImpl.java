@@ -5,7 +5,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.dinetime.ports.output.EmailSenderService;
+import com.dinetime.identity_service.ports.output.EmailSenderService;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

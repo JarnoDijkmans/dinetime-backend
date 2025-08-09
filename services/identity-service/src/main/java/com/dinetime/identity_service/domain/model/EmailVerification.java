@@ -1,6 +1,6 @@
 package com.dinetime.identity_service.domain.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmailVerification {
 
-    private EmailAddress email;
-    private String code;
-    private LocalDateTime expiresAt;
+    private String hashedEmail;
+    private String hashedCode;
+    private Instant expiresAt;
 
 }

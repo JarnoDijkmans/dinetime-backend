@@ -1,6 +1,6 @@
 package com.dinetime.identity_service.adapters.web.response;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class EmailVerificationResponse {
     private boolean success;
     private String message;
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 }
