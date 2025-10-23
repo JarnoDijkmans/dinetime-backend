@@ -25,14 +25,11 @@ The DineTime backend handles all the core logic and data management for the app.
 - When voting ends, the system aggregates votes and returns a Top 5 list of meals for the group.
 
 ## 🏗️ Tech Stack
-Category,Technology,Rationale
-Languages,TypeScript (Node.js) & Java,"TypeScript powers the I/O-heavy services (e.g., API Gateway, Voting) for efficiency, while Java (Spring Boot) handles CPU-intensive core logic (e.g., Meal Pool Generation)."
-Frameworks,Express.js & Spring Boot,"Express.js provides a minimal, high-performance API entry point. Spring Boot offers a robust, established environment for building core business microservices."
-API Architecture,RESTful APIs,Standard protocol for public communication.
-Inter-Service Comms,gRPC (Recommended),"High-performance, language-agnostic protocol for efficient communication between the Java and Node.js microservices."
-Database,MySQL,"A reliable relational database used for structured data, including User, Group, and Preference management."
-Data Access,TypeORM / JPA (Hibernate),"Utilizes appropriate Object-Relational Mappers (ORMs) for simplified, type-safe data interaction within each language environment."
-In-Memory Store,Redis,"Used for fast-access caching, rate limiting, and temporary state management (e.g., real-time voting results)."
-Authentication,JWT (JSON Web Tokens),Stateless authentication for securing endpoints and transmitting authenticated user identity across the microservice boundary.
-Testing,Jest / JUnit,"Comprehensive testing frameworks used for unit, integration, and end-to-end testing across both the Node.js and Java services."
-Architecture,Hexagonal Architecture & Polyglot Microservices,"Design principles promoting decoupled business logic, testability, and technology independence at the service level."
+Languages:	TypeScript (Node.js) / Java
+Frameworks:	Express.js / Spring Boot
+API Architecture:	RESTful APIs
+Database:	MySQL
+In-Memory Storage: Redis
+Authentication:	JWT (JSON Web Tokens)
+Testing	Jest / JUnit
+Architecture	Hexagonal Architecture / Microservices
