@@ -25,11 +25,11 @@ The DineTime backend handles all the core logic and data management for the app.
 - When voting ends, the system aggregates votes and returns a Top 5 list of meals for the group.
 
 ## 🏗️ Tech Stack
-Languages:	TypeScript (Node.js) / Java
-Frameworks:	Express.js / Spring Boot
-API Architecture:	RESTful APIs
-Database:	MySQL
-In-Memory Storage: Redis
-Authentication:	JWT (JSON Web Tokens)
-Testing	Jest / JUnit
-Architecture	Hexagonal Architecture / Microservices
+- Languages:	TypeScript (Node.js) / Java
+- Frameworks:	Express.js / Spring Boot
+- API Architecture:	RESTful APIs
+- Database:	MySQL
+- In-Memory Storage: Redis
+- Authentication:	JWT (JSON Web Tokens)
+- Testing	Jest / JUnit
+- Architecture	Hexagonal Architecture / Microservices
