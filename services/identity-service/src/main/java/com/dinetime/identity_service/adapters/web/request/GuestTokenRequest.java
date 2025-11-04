@@ -6,6 +6,5 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GuestTokenRequest {
-    private String lobbyCode;
     private String deviceId;
 }
