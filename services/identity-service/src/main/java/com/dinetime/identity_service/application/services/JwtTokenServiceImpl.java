@@ -6,13 +6,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.dinetime.identity_service.ports.input.JwtTokenService;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
@@ -30,8 +30,13 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .build();
     }
 
-    @Override
-    public String generateAccessToken(String email, String deviceId) {
+    /**
+     * Generates an access token for a given profile in a user's account.
+     * @param email - The main account email.
+     * @param deviceId - The device identifier.
+     * @param profileId - The sub-profile ID (null or default if single-profile).
+     */
+    public String generateAccessToken(String email, String deviceId, UUID profileId) {
         Instant now = Instant.now();
         Instant expiry = now.plus(accessTokenTtlMinutes, ChronoUnit.MINUTES);
 
@@ -41,13 +46,17 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(expiry))
                 .withClaim("device", deviceId)
-                .withClaim("role", "user") // adjust if you have multiple roles
+                .withClaim("role", "user")
+                .withClaim("profileId", profileId.toString())
                 .sign(algorithm);
     }
 
+    /**
+     * Generates a guest token tied to a device and (optionally) a guest profile ID.
+     */
     public String generateGuestToken(String deviceId) {
         Instant now = Instant.now();
-        Instant expiry = now.plus(30, ChronoUnit.MINUTES); // guest tokens expire faster
+        Instant expiry = now.plus(15, ChronoUnit.MINUTES); 
 
         return JWT.create()
                 .withSubject("guest")
@@ -59,10 +68,16 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .sign(algorithm);
     }
 
+    /**
+     * Validates and returns the decoded JWT.
+     */
     public DecodedJWT validateToken(String token) throws JWTVerificationException {
         return verifier.verify(token);
     }
 
+    /**
+     * Generates a short-lived token for email verification.
+     */
     @Override
     public String generateEmailVerificationToken(String email) {
         return JWT.create()

@@ -11,44 +11,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dinetime.identity_service.adapters.web.request.EmailValidateRequest;
-import com.dinetime.identity_service.adapters.web.request.EmailVerificationRequest;
+import com.dinetime.identity_service.adapters.web.request.CreateUserProfileRequest;
 import com.dinetime.identity_service.adapters.web.response.ApiError;
-import com.dinetime.identity_service.adapters.web.response.EmailVerificationResponse;
-import com.dinetime.identity_service.domain.exceptions.VerificationException;
-import com.dinetime.identity_service.ports.input.ValidationService;
+import com.dinetime.identity_service.adapters.web.response.AuthResponse;
+import com.dinetime.identity_service.domain.exceptions.UserException;
+import com.dinetime.identity_service.ports.input.UserService;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/identity")
 @Validated
-public class ValidationController {
+public class UserController {
+     private static final Logger log = LoggerFactory.getLogger(ValidationController.class);
 
-    private static final Logger log = LoggerFactory.getLogger(ValidationController.class);
+    private final UserService userService;
 
-    private final ValidationService validationService;
-
-    public ValidationController(ValidationService validationService) {
-        this.validationService = validationService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/email-validation/request")
-    public ResponseEntity<EmailVerificationResponse> sendVerificationEmail(
-            @Valid @RequestBody EmailVerificationRequest request) {
-        EmailVerificationResponse response = validationService.sendEmailVerificationCode(request);
+    @PostMapping("/create-user/request")
+    public ResponseEntity<AuthResponse> createUser(@Valid @RequestBody CreateUserProfileRequest request) {
+        AuthResponse response = userService.createUserProfile(request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/email-validation/validate")
-    public ResponseEntity<Boolean> validateEmailCode(
-            @Valid @RequestBody EmailValidateRequest request) {
-        boolean response = validationService.validateEmailCode(request.getEmail(), request.getCode());
-        return ResponseEntity.ok(response);
-    }
-
-    @ExceptionHandler(VerificationException.class)
-    public ResponseEntity<ApiError> handleVerificationException(VerificationException ex) {
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<ApiError> handleVerificationException(UserException ex) {
         log.warn("Verification failed: {}", ex.getMessage());
         ApiError error = new ApiError("verification_failed", "Invalid verification attempt");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);

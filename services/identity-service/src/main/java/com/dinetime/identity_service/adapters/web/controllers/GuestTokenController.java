@@ -8,7 +8,7 @@ import com.dinetime.identity_service.adapters.web.response.GuestTokenResponse;
 import com.dinetime.identity_service.application.services.JwtTokenServiceImpl;
 
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/identity")
 public class GuestTokenController {
 
     private final JwtTokenServiceImpl jwtTokenService;
@@ -17,7 +17,7 @@ public class GuestTokenController {
         this.jwtTokenService = jwtTokenService;
     }
 
-    @PostMapping("/guest")
+    @PostMapping("/guest/request")
     public ResponseEntity<?> generateGuestToken(@RequestBody GuestTokenRequest request) {
         if (request.getDeviceId() == null) {
             return ResponseEntity.badRequest().body("Missing deviceId");

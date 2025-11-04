@@ -16,8 +16,12 @@ import jakarta.transaction.Transactional;
 public interface JpaVerificationRepository extends JpaRepository<EntityEmailVerification, Long> {
     @Modifying
     @Transactional
-    @Query("UPDATE EntityEmailVerification e SET e.code = :code, e.expiresAt = :expiresAt WHERE e.email = :email")
-    int updateCodeAndExpiryByEmail(@Param("code") String code, @Param("expiresAt") Instant expiresAt, @Param("email") String email);
+    @Query("UPDATE EntityEmailVerification e SET e.code = :code, e.expiresAt = :expiresAt, e.verified = :verified WHERE e.email = :email")
+    int updateCodeExpiryAndVerifiedByEmail(
+            @Param("code") String code,
+            @Param("expiresAt") Instant expiresAt,
+            @Param("verified") boolean verified,
+            @Param("email") String email);
 
-    EntityEmailVerification findByEmail(String hashedEmail);    
+    EntityEmailVerification findByEmail(String hashedEmail);
 }

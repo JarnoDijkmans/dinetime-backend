@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Table(
     name = "email_verifications",
     uniqueConstraints = @UniqueConstraint(columnNames = "email")
@@ -20,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class EntityEmailVerification {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
@@ -32,9 +32,12 @@ public class EntityEmailVerification {
 
     private Instant expiresAt;
 
-    public EntityEmailVerification(String email, String code, Instant expiresAt) {
+    private boolean verified;
+
+    public EntityEmailVerification(String email, String code, Instant expiresAt, boolean verified) {
         this.email = email;
         this.code = code;
         this.expiresAt = expiresAt;
+        this.verified = verified;
     }
 }

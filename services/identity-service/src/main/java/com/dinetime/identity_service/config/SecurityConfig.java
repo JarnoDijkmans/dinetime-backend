@@ -14,7 +14,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers(new AntPathRequestMatcher("/api/token/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/identity/**")).permitAll()
                 .anyRequest().denyAll()
             )
             .httpBasic(Customizer.withDefaults())
