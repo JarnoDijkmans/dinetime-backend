@@ -16,16 +16,20 @@ spec:
     spec:
       containers:
         - name: ranking-service
-          image: docker.io/dockerjarnodijkmans/ranking-service:824c280de3844e0014e72fa715f61836fdbdf1ff
+          image: dinetimeacr.azurecr.io/ranking-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "prod"
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "500m"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://ranking-mysql:3306/dinetime_ranking_db
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD 
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password

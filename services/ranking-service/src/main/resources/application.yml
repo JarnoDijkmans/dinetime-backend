@@ -10,5 +10,9 @@ spring:
      properties:
        hibernate.dialect: org.hibernate.dialect.MySQLDialect
 
+server:
+  port: 80
+
 jwt:
   secret: ADQdZcCYhcmB7jDoE1C/t3f0rbN4BTH/iAk6hTE5FyqqzObXHdN2H9vVCs0JJZTOXkP64ZyjWcvitfku9/YOnA==
+  

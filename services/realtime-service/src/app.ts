@@ -1,6 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import http from "http";
-import express from "express";
+import express, { Request, Response } from "express";
 import "./infrastructure/flushVotesToDatabase";
 import { WebSocketGateway } from "./presentation/websocket/websocketGateway";
 import { LeaderboardService } from "./application/services/leaderboardService";
@@ -10,6 +10,12 @@ import { WebsocketMessageHandler } from "./application/websocket/websocketMessag
 import { WebSocketServer } from "ws";
 
 const app = express();
+dotenv.config();
+console.log("JWT_SECRET in Node.js:", process.env.JWT_SECRET ? process.env.JWT_SECRET.slice(0,8)+"..." : "(not set)");
+app.get("/", (req: Request, res: Response) => res.status(200).send("OK"));
+app.get("/realtime", (req: Request, res: Response) => res.status(200).send("OK"));
+app.get("/healthz", (req: Request, res: Response) => res.status(200).send("OK"));
+app.get("/realtime/healthz", (req: Request, res: Response) => res.status(200).send("OK"));
 const PORT = Number(process.env.PORT) || 5000;
 
 const server = http.createServer(app);
