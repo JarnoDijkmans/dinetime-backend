@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ranking-ingress
+  annotations:
+    appgw.ingress.kubernetes.io/health-probe-path: /ranking/healthz
+spec:
+  ingressClassName: azure-application-gateway
+  rules:
+    - http:
+        paths:
+          - path: /ranking
+            pathType: Prefix
+            backend:
+              service:
+                name: ranking-service
+                port:
+                  number: 80

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ranking-service
+  labels:
+    app: ranking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ranking-service
+  template:
+    metadata:
+      labels:
+        app: ranking-service
+    spec:
+      containers:
+        - name: ranking-service
+          image: dinetimeacr.azurecr.io/ranking-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://ranking-mysql:3306/dinetime_ranking_db
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD 
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: password

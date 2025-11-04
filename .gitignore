@@ -36,7 +36,6 @@ node_modules/
 
 
 # Ignore compiled JS files
-*.js
 *.js.map
 dist/
 build/
@@ -68,3 +67,5 @@ base.css
 report-task.txt
 
 *.log
+
+.env

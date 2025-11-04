@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/services/matchmaker-service"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "/services/ranking-service"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "/services/identity-service"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "/services/realtime-service"
+    schedule:
+      interval: "daily"

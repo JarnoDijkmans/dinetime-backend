@@ -13,23 +13,23 @@ export async function flushLeaderboardsToRankingService() {
 
         await redis.set("processing_lock", "true", "EX", 300);
 
-        const keys = await redis.keys("pending_votes:*");
-        if (keys.length === 0) {
-            console.log("No leaderboards to flush.");
+        const dirtyLobbies = await redis.smembers("dirty_lobbies");
+        if (dirtyLobbies.length === 0) {
+            console.log("No dirty lobbies to flush.");
             await redis.del("processing_lock");
             return;
         }
 
-        const leaderboards: Record<string, { mealId: number; totalScore: number }[]> = {};
+        const leaderboards: Record<string, { mealId: string; totalScore: number }[]> = {};
 
-        for (const key of keys) {
-            const lobbyCode = key.split(":")[1]; 
-            const meals = await redis.hgetall(key);
+        for (const lobbyCode of dirtyLobbies) {
+            const pendingVotesKey = `pending_votes:${lobbyCode}`;
+            const meals = await redis.hgetall(pendingVotesKey);
 
             const validMeals = Object.entries(meals)
                 .filter(([_, totalScore]) => totalScore.trim() !== "") 
                 .map(([mealId, totalScore]) => ({
-                    mealId: parseInt(mealId),
+                    mealId,
                     totalScore: parseFloat(totalScore),
                 }));
 
@@ -46,18 +46,19 @@ export async function flushLeaderboardsToRankingService() {
         try {
             await axios.post("http://localhost:5001/leaderboards/batch", { leaderboards });
 
-            for (const key of keys) {
-                await redis.del(key);
+            for (const lobbyCode of Object.keys(leaderboards)) {
+                await redis.del(`pending_votes:${lobbyCode}`);
+                await redis.srem("dirty_lobbies", lobbyCode);
             }
 
-            console.log(`Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
+            console.log(`✅ Sent ${Object.keys(leaderboards).length} leaderboards to ranking-service.`);
         } catch (error) {
-            console.error("Error sending leaderboards to ranking-service:", error);
+            console.error("❌ Error sending leaderboards to ranking-service:", error);
         }
 
         await redis.del("processing_lock");
     } catch (error) {
-        console.error("Unexpected error in leaderboard flush:", error);
+        console.error("❌ Unexpected error in leaderboard flush:", error);
     }
 }
 

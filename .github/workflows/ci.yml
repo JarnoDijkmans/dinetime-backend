@@ -1,0 +1,120 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matchmaker_changed: ${{ steps.filter.outputs.matchmaker }}
+      ranking_changed: ${{ steps.filter.outputs.ranking }}
+      realtime_changed: ${{ steps.filter.outputs.realtime }}
+      ci: ${{ steps.filter.outputs.ci }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          base: ${{ github.event.before }}
+          ref: ${{ github.sha }}
+          filters: |
+            matchmaker:
+              - 'services/matchmaker-service/**'
+            ranking:
+              - 'services/ranking-service/**'
+            realtime:
+              - 'services/realtime-service/**'
+            ci:
+              - '.github/workflows/**'
+              - 'ci-cd.yml'
+              - '*.md'
+
+  run-tests-and-analysis:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.matchmaker_changed == 'true' || 
+        needs.detect-changes.outputs.ranking_changed == 'true' || 
+        needs.detect-changes.outputs.realtime_changed == 'true'
+    steps:
+        - uses: actions/checkout@v3
+
+        - name: Cache Gradle
+          uses: actions/cache@v3
+          with:
+            path: ~/.gradle/caches
+            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            restore-keys: |
+              ${{ runner.os }}-gradle
+
+        - name: Cache Node modules
+          uses: actions/cache@v3
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+            restore-keys: |
+              ${{ runner.os }}-node
+
+        - name: Set up Java
+          uses: actions/setup-java@v3
+          with:
+            distribution: 'temurin'
+            java-version: '17'
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: '18'
+
+
+        # Matchmaker Tests + Sonar
+        - name: Run Matchmaker Tests
+          if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+          run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
+          working-directory: services/matchmaker-service
+
+        - name: Analyze Matchmaker with SonarCloud
+          if: needs.detect-changes.outputs.matchmaker_changed == 'true'
+          run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          working-directory: services/matchmaker-service
+
+
+        # Ranking Tests + Sonar
+        - name: Run Ranking Tests and Coverage
+          if: needs.detect-changes.outputs.ranking_changed == 'true'
+          run: ./gradlew clean test jacocoTestReport -Dspring.profiles.active=test
+          working-directory: services/ranking-service
+
+        - name: Analyze Ranking with SonarCloud
+          if: needs.detect-changes.outputs.ranking_changed == 'true'
+          run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          working-directory: services/ranking-service
+
+        # Realtime Tests + Sonar + Dependency Check
+        - name: Run Realtime Tests
+          if: needs.detect-changes.outputs.realtime_changed == 'true'
+          run: |
+            npm ci
+            npm test
+          working-directory: services/realtime-service
+
+
+        - name: Analyze Realtime with SonarCloud
+          uses: SonarSource/sonarcloud-github-action@v2.2
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          with:
+            projectBaseDir: services/realtime-service
+            args: >
+                -Dsonar.organization=dinetime-sonar
+                -Dsonar.projectKey=dinetime-sonar_realtime-service
+                -Dsonar.host.url=https://sonarcloud.io

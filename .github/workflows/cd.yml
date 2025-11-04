@@ -1,0 +1,96 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+      - name: Azure Container Registry Login
+        uses: azure/docker-login@v1
+        with:
+            login-server: dinetimeacr.azurecr.io
+            username: ${{ secrets.ACR_USERNAME }}
+            password: ${{ secrets.ACR_PASSWORD }}
+
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Java JARs
+        run: |
+          cd services/matchmaker-service && ./gradlew bootJar && cd ../..
+          cd services/ranking-service && ./gradlew bootJar && cd ../..
+          cd services/identity-service && ./gradlew bootJar && cd ../..
+
+      - name: Build Realtime Service (Node.js)
+        run: |
+          cd services/realtime-service
+          npm ci
+          npm run build || echo "No build script defined; skipping..."
+          cd ../..
+
+
+      - name: Build All Services
+        run: docker compose build
+
+      - name: Tag and Push Matchmaker Image
+        run: |
+          docker tag dinetime-backend-matchmaker-service dinetimeacr.azurecr.io/matchmaker-service:${{ github.sha }}
+          docker tag dinetime-backend-matchmaker-service dinetimeacr.azurecr.io/matchmaker-service:latest
+
+          docker push dinetimeacr.azurecr.io/matchmaker-service:${{ github.sha }}
+          docker push dinetimeacr.azurecr.io/matchmaker-service:latest
+
+      - name: Tag and Push Ranking Image
+        run: |
+          docker tag dinetime-backend-ranking-service dinetimeacr.azurecr.io/ranking-service:${{ github.sha }}
+          docker tag dinetime-backend-ranking-service dinetimeacr.azurecr.io/ranking-service:latest
+
+          docker push dinetimeacr.azurecr.io/ranking-service:${{ github.sha }}
+          docker push dinetimeacr.azurecr.io/ranking-service:latest
+
+      - name: Tag and Push Realtime Image
+        run: |
+          docker tag dinetime-backend-realtime-service dinetimeacr.azurecr.io/realtime-service:${{ github.sha }}
+          docker tag dinetime-backend-realtime-service dinetimeacr.azurecr.io/realtime-service:latest
+
+          docker push dinetimeacr.azurecr.io/realtime-service:${{ github.sha }}
+          docker push dinetimeacr.azurecr.io/realtime-service:latest
+
+      - name: Tag and Push Identity Image
+        run: |
+          docker tag dinetime-backend-identity-service dinetimeacr.azurecr.io/identity-service:${{ github.sha }}
+          docker tag dinetime-backend-identity-service dinetimeacr.azurecr.io/identity-service:latest
+
+          docker push dinetimeacr.azurecr.io/identity-service:${{ github.sha }}
+          docker push dinetimeacr.azurecr.io/identity-service:latest
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+            resource-group: ${{ secrets.AZURE_RG }}
+            cluster-name: ${{ secrets.AZURE_AKS_CLUSTER }}
+
+      - name: Sync JWT Secret to k8s
+        run: |
+          kubectl create secret generic jwt-secret \
+            --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --namespace=default \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy base resources (services, deployments, db, etc.)
+        run: kubectl apply -R -f k8s/base/
+
+      - name: Deploy ingress
+        run: kubectl apply -R -f k8s/ingress/
